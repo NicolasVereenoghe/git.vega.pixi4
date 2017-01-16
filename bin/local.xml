@@ -1,0 +1,26 @@
+<xml>
+
+
+<en>
+
+	<local id="screenInitLoadTitle"><![CDATA[Loading]]></local>
+	
+	<local id="helpLine1"><![CDATA[helpLine1]]></local>
+	<local id="helpLine2"><![CDATA[helpLine2]]></local>
+	<local id="helpLine3"><![CDATA[helpLine3]]></local>
+
+</en>
+
+
+<fr>
+
+	<local id="screenInitLoadTitle"><![CDATA[Chargement]]></local>
+	
+	<local id="helpLine1"><![CDATA[helpLine1]]></local>
+	<local id="helpLine2"><![CDATA[helpLine2]]></local>
+	<local id="helpLine3"><![CDATA[helpLine3]]></local>
+	
+</fr>
+
+
+</xml>

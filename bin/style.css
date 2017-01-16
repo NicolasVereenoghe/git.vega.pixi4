@@ -1,0 +1,16 @@
+body {
+	margin: 0px;
+	padding: 0px;
+	background-image: url(bg.png);
+	background-repeat: repeat;
+	text-align:center;
+}
+
+iframe {
+	width: 960px;
+	height: 640px;
+	background-color: #FFF;
+	box-shadow: 0 0 4px 2px #222;
+	padding: 10px;
+	border: none;
+}

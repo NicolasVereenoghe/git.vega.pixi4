@@ -1,0 +1,68 @@
+{
+	"assets": {
+		"map": "0",
+		"lock_instance": "1",
+		"groups": [
+			{
+				"id": "mini",
+				"file": {
+					"name": "library.json",
+					"path": "assets/assetsMini/"
+				},
+				"instance": "0",
+				"assets": [
+					{
+						"id": "screenSplash",
+						"export": "screenSplash",
+						"render": { "name": "flump", "type": "mc"}
+					},
+					{
+						"id": "screenInitLoad",
+						"export": "screenInitLoad",
+						"render": { "name": "flump", "type": "mc"}
+					}
+				]
+			},
+			{
+				"id": "main",
+				"file": {
+					"name": "library.json",
+					"path": "assets/assetsMain/"
+				},
+				"instance": "0",
+				"assets": [
+					{
+						"id": "btFullscreen",
+						"export": "btFullscreen",
+						"render": { "name": "flump", "type": "mc"}
+					},
+					{
+						"id": "screenMain",
+						"export": "screenMain",
+						"render": { "name": "flump", "type": "mc"}
+					},
+					{
+						"id": "myHUD",
+						"export": "myHUD",
+						"render": { "name": "flump", "type": "mc"}
+					},
+					{
+						"id": "popHelp",
+						"export": "popHelp",
+						"render": { "name": "flump", "type": "mc"}
+					}
+				]
+			},
+			{
+				"id": "gameGame",
+				"file": {
+					"name": "library.json",
+					"path": "assets/assetsGame/"
+				},
+				"unlock_instance": "1",
+				"instance": "1",
+				"assets": []
+			}
+		]
+	}
+}

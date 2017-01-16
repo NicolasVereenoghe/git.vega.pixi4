@@ -87,10 +87,23 @@ function SearchFrame(f) {
 	for (var k = 0 ; k < f.elements.length ; k++) {
 		e = f.elements[k];
 		if(e.elementType == "instance") {
-				
-			e.x *= theScaleX;
-			e.y *= theScaleY;
-	
+			if(e.instanceType == "bitmap"){
+				try {
+					var lX = e.x * theScaleX;
+					var lY = e.y * theScaleY;
+			
+					e.scaleX *= theScaleX;
+					e.scaleY *= theScaleY;
+					e.x = lX;
+					e.y = lY;
+				} catch (e) {
+					
+				}
+					
+			}else{
+				e.x *= theScaleX;
+				e.y *= theScaleY;
+			}
 		} else if(e.elementType == "text") {
 	
 			var oldsize = e.getTextAttr("size");

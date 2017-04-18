@@ -66,8 +66,9 @@ class SndTrack {
 	 * on joue une occurence de son de la piste
 	 * @param	pMode			mode de lecture du son, laisser null pour une lecture par défaut
 	 * @param	pCheckInvalid	true pour demander un mode de lecture dans lequel on contrôle la validité du composant son avant d'ouvrir le canal
+	 * @return	instance de son ouverte
 	 */
-	public function play( pMode : SndPlayMode = null, pCheckInvalid : Bool = false) : Void { addSndInstance( pMode == null ? _desc.playMode : pMode, pCheckInvalid); }
+	public function play( pMode : SndPlayMode = null, pCheckInvalid : Bool = false) : SndInstance { return addSndInstance( pMode == null ? _desc.playMode : pMode, pCheckInvalid); }
 	
 	/**
 	 * on arrête toutes les occurences de sons de cette piste
@@ -133,25 +134,16 @@ class SndTrack {
 			_volumeCoef = pCoef;
 		}
 		
-		for ( lSnd in _channels){
-			if ( lSnd.chan >= 0){
-				if ( pCoef < 0) {
-					ApplicationMatchSize.instance.traceDebug( "INFO : SndTrack::setVolumeCoef : " + _desc.getId() + " : " + lSnd.chan + " -> " + _desc.getHowl().volume());
-					_desc.getHowl().volume( _desc.getHowl().volume(), lSnd.chan);}
-				else {
-					ApplicationMatchSize.instance.traceDebug( "INFO : SndTrack::setVolumeCoef : " + _desc.getId() + " : " + lSnd.chan + " -> " + ( _desc.getHowl().volume() * pCoef));
-					_desc.getHowl().volume( _desc.getHowl().volume() * pCoef, lSnd.chan);
-				}
-			}
-		}
+		for ( lSnd in _channels) lSnd.updateVolume();
 	}
 	
 	/**
 	 * on lance une instance de son
 	 * @param	pMode			mode de lecture du son, laisser null pour une lecture par défaut
 	 * @param	pCheckInvalid	true pour demander un mode de lecture dans lequel on contrôle la validité du composant son avec d'ouvrir le canal
+	 * @return	instance de son créée
 	 */
-	function addSndInstance( pMode : SndPlayMode = null, pCheckInvalid : Bool = false) : Void {
+	function addSndInstance( pMode : SndPlayMode = null, pCheckInvalid : Bool = false) : SndInstance {
 		var lSnd	: SndInstance;
 		
 		lSnd = new SndInstance( this);
@@ -163,6 +155,8 @@ class SndTrack {
 		if ( ! ( _desc.getIsLoaded() || isLoading)) {
 			doLoad();
 		}
+		
+		return lSnd;
 	}
 	
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2005-2012 Haxe Foundation
+ * Copyright (C)2005-2017 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,6 +21,7 @@
  */
 @:coreApi class Reflect {
 
+	@:pure
 	public inline static function hasField( o : Dynamic, field : String ) : Bool {
 		return untyped __js__('Object').prototype.hasOwnProperty.call(o, field);
 	}
@@ -33,12 +34,12 @@
 		o[field] = value;
 	}
 
-	public static inline function getProperty( o : Dynamic, field : String ) : Dynamic untyped {
+	public static function getProperty( o : Dynamic, field : String ) : Dynamic untyped {
 		var tmp;
 		return if( o == null ) __define_feature__("Reflect.getProperty",null) else if( o.__properties__ && (tmp=o.__properties__["get_"+field]) ) o[tmp]() else o[field];
 	}
 
-	public static inline function setProperty( o : Dynamic, field : String, value : Dynamic ) : Void untyped {
+	public static function setProperty( o : Dynamic, field : String, value : Dynamic ) : Void untyped {
 		var tmp;
 		if( o.__properties__ && (tmp=o.__properties__["set_"+field]) ) o[tmp](value) else o[field] = __define_feature__("Reflect.setProperty",value);
 	}

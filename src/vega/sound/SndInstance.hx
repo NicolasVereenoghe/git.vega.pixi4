@@ -30,6 +30,10 @@ class SndInstance {
 	/** itération de frame ; null si pas d'itération en cours */
 	var doMode							: Void->Void					= null;
 	
+	/** coef appliqué au volume de base de ce son (de base : celui trouvé dans l'objet Howl du descripteur) ; [ 0 .. 1] */
+	public var volume( get, set)		: Float;
+	var _volume							: Float							= 1;
+	
 	/**
 	 * construction
 	 * @param	pTrack	piste sonore en charge de cette instance de son
@@ -82,6 +86,25 @@ class SndInstance {
 		if ( openTimestamp >= 0) return openTimestamp;
 		else if ( playTimestamp >= 0) return playTimestamp;
 		else return createTimestamp;
+	}
+	
+	/**
+	 * on force la mise à jour du volume du son
+	 */
+	public function updateVolume() : Void {
+		if ( _chan >= 0){
+			if ( _track.volumeCoef >= 0) _track.getDesc().getHowl().volume( _track.getDesc().getHowl().volume() * _track.volumeCoef * _volume, _chan);
+			else _track.getDesc().getHowl().volume( _track.getDesc().getHowl().volume() * _volume, _chan);
+		}
+	}
+	
+	function get_volume() : Float { return _volume; }
+	function set_volume( pVol : Float) : Float {
+		_volume = pVol;
+		
+		updateVolume();
+		
+		return _volume;
 	}
 	
 	/**
@@ -302,7 +325,7 @@ class SndInstance {
 				openTimestamp = cast( mode, ISndPlayModeSync).getSyncStartedAtTime();
 			}else openTimestamp	= lTime;
 			
-			if ( _track.volumeCoef >= 0) _track.getDesc().getHowl().volume( _track.getDesc().getHowl().volume() * _track.volumeCoef, _chan);
+			updateVolume();
 			
 			ApplicationMatchSize.instance.traceDebug( "INFO : SndInstance::openChan : " + _track.getDesc().getId() + " : " + _chan);
 		}else{
@@ -316,32 +339,38 @@ class SndInstance {
 	 * on capture la fin de lecture du canal sonore ; si pas de boucle, on détruit ce canal
 	 */
 	function onSndEnd() : Void {
-		if ( _chan >= 0) {
-			if ( _track.getDesc().getOptions().loop){
-				if ( _track.getDesc().getHowl().playing( _chan)){
-					ApplicationMatchSize.instance.traceDebug( "INFO : SndInstance::onSndEnd : loop " + _track.getDesc().getId() + " : " + _chan);
+		if( _track != null){
+			if ( _chan >= 0) {
+				if ( _track.getDesc().getOptions().loop){
+					if ( _track.getDesc().getHowl().playing( _chan)){
+						ApplicationMatchSize.instance.traceDebug( "INFO : SndInstance::onSndEnd : loop " + _track.getDesc().getId() + " : " + _chan);
+						
+						if( ! Std.is( mode, ISndPlayModeSync)) _track.getDesc().getHowl().seek( 0.0, _chan);
+					}else{
+						ApplicationMatchSize.instance.traceDebug( "WARNING : SndInstance::onSndEnd : broken loop, restart : " + _track.getDesc().getId() + " : " + _chan);
+						
+						_chan = _track.getDesc().getHowl().play();
+					}
 					
-					if( ! Std.is( mode, ISndPlayModeSync)) _track.getDesc().getHowl().seek( 0.0, _chan);
-				}else{
-					ApplicationMatchSize.instance.traceDebug( "WARNING : SndInstance::onSndEnd : broken loop, restart : " + _track.getDesc().getId() + " : " + _chan);
+					if( Std.is( mode, ISndPlayModeSync)) _track.getDesc().getHowl().seek( ( ( Date.now().getTime() - cast( mode, ISndPlayModeSync).getSyncStartedAtTime()) / 1000) % _track.getDesc().getHowl().duration(), _chan);
 					
-					_chan = _track.getDesc().getHowl().play();
+					return;
 				}
 				
-				if( Std.is( mode, ISndPlayModeSync)) _track.getDesc().getHowl().seek( ( ( Date.now().getTime() - cast( mode, ISndPlayModeSync).getSyncStartedAtTime()) / 1000) % _track.getDesc().getHowl().duration(), _chan);
-				
-				return;
+				_track.getDesc().getHowl().off( "end", onSndEnd, _chan);
 			}
 			
-			_track.getDesc().getHowl().off( "end", onSndEnd, _chan);
+			doMode = null;
+			VegaFramer.getInstance().remIterator( onFrame);
+			
+			ApplicationMatchSize.instance.traceDebug( "INFO : SndInstance::onSndEnd : " + _track.getDesc().getId() + " : " + _chan);
+			
+			_track.onChanStop( this);
+			
+			_track = null;
+			mode = null;
+			_chan = -1;
 		}
-		
-		doMode = null;
-		VegaFramer.getInstance().remIterator( onFrame);
-		
-		ApplicationMatchSize.instance.traceDebug( "INFO : SndInstance::onSndEnd : " + _track.getDesc().getId() + " : " + _chan);
-		
-		_track.onChanStop( this);
 	}
 	
 	/**

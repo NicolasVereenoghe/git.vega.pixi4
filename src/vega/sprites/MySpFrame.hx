@@ -1,8 +1,10 @@
 package vega.sprites;
+import pixi.core.display.DisplayObject.DestroyOptions;
 import pixi.core.math.Point;
 import vega.sprites.MyCell;
 import vega.sprites.MySpriteMgr;
 import vega.utils.PointIJ;
+import haxe.extern.EitherType;
 
 /**
  * sprite avec itération de frame
@@ -32,10 +34,10 @@ class MySpFrame extends MySprite {
 	}
 	
 	/** @inheritDoc */
-	override public function destroy() : Void {
+	override public function destroy( ?options : EitherType<Bool,DestroyOptions>) : Void {
 		isInteractive = false;
 		
-		mgr.remSpFrame( this);
+		remSpFrame();
 		
 		super.destroy();
 	}
@@ -83,10 +85,22 @@ class MySpFrame extends MySprite {
 			for ( lCell in lCells) {
 				lSps	= mgr.getSpriteCell( lCell, lIJ);
 				
-				for ( lSp in lSps) if ( lSp != this) lSp.doEffect( this, lXY);
+				for ( lSp in lSps){
+					if ( lSp != this) onEffect( lSp, lXY);
+					
+					if ( ! isInteractive) return;
+				}
 			}
 		}
 	}
+	
+	/**
+	 * on a trouvé ce sprite près du notre, on veut tester et résoudre les effets à partir de notre coordonnée de touche sur notre voisin
+	 * @param	pSp	sprite voisin
+	 * @param	pXY	notre coordonnée de test sur le voisin
+	 * @return	true si interaction résolue, false sinon
+	 */
+	function onEffect( pSp : MySprite, pXY : Point) : Bool { return pSp.doEffect( this, pXY); }
 	
 	/**
 	 * on récupère la coordonnée de jeu qui représente le centre de gravité du sprite

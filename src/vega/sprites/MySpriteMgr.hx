@@ -16,9 +16,9 @@ class MySpriteMgr {
 	var grounds									: Map<String,GroundMgr>;
 	
 	/** map de tous les sprites indexés par noms d'instance */
-	var sprites									: Map<String,MySprite>;
+	var sprites									: Array<MySprite>;
 	/** map des sprites avec itération de frame indexés par noms d'instance */
-	var spFrames								: Map<String,MySpFrame>;
+	var spFrames								: Array<MySpFrame>;
 	
 	var _gMgr									: IGameMgr;
 	
@@ -43,8 +43,8 @@ class MySpriteMgr {
 		container	= pCont;
 		_gMgr		= pGMgr;
 		_camera		= pCamera;
-		sprites		= new Map<String,MySprite>();
-		spFrames	= new Map<String,MySpFrame>();
+		sprites		= new Array<MySprite>();
+		spFrames	= new Array<MySpFrame>();
 		grounds		= new Map<String,GroundMgr>();
 		
 		initGrounds();
@@ -62,9 +62,13 @@ class MySpriteMgr {
 	}
 	
 	public function destroy() : Void {
-		
+		var lSps	: Array<MySprite>;
+		var lSp		: MySprite;
 		
 		freeGrounds();
+		
+		lSps = sprites.copy();
+		for ( lSp in lSps) remSpriteDisplay( lSp);
 		
 		freeContainers();
 		
@@ -113,10 +117,11 @@ class MySpriteMgr {
 	 * @param	pInstanceID		identifiant d'instance de sprite ; null pour avoir un nom automatique
 	 * @param	pScale			composantes x y du scale à appliquer au sprite, null si aucun
 	 * @param	pForceDisplay	true pour forcer l'affichage du sprite sans test de clipping ; false pour afficher uniquement si test de clipping ok
+	 * @param	pRot			orientation en rad
 	 * @return	la cellule de sprite créée
 	 */
-	public function addSpriteCell( pGroundId : String, pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false) : MyCell {
-		return grounds[ pGroundId].addSpriteCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale, pForceDisplay);
+	public function addSpriteCell( pGroundId : String, pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
+		return grounds[ pGroundId].addSpriteCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale, pForceDisplay, pRot);
 	}
 	
 	public function remSpriteCell( pDesc : MyCell) : Void {
@@ -140,24 +145,24 @@ class MySpriteMgr {
 	 * on enregistre un sprite à l'itération de frame
 	 * @param	pSp	sprite itéré à la frame
 	 */
-	public function regSpFrame( pSp : MySpFrame) : Void { spFrames[ pSp.name] = pSp; }
+	public function regSpFrame( pSp : MySpFrame) : Void { spFrames.push( pSp); }
 	
 	/**
 	 * on retire un sprite de l'itération de frame
 	 * @param	pSp	sprite itéré à la frame
 	 */
-	public function remSpFrame( pSp : MySpFrame) : Void { spFrames.remove( pSp.name); }
+	public function remSpFrame( pSp : MySpFrame) : Void { spFrames.remove( pSp); }
 	
 	public function addSpriteDisplay( pSp : MySprite, pX : Float, pY : Float, pID : String = null, pDesc : MyCell = null) : Void {
 		if ( pDesc != null && pDesc.getLvlGroundMgr() != null) {
 			grounds[ pDesc.getLvlGroundMgr().getId()].addSpriteDisplay( pSp, pX, pY, pID, pDesc);
 		}
 		
-		sprites[ pSp.name] = pSp;
+		sprites.push( pSp);
 	}
 	
 	public function remSpriteDisplay( pSp : MySprite) : Void {
-		sprites.remove( pSp.name);
+		sprites.remove( pSp);
 		
 		if ( pSp.getDesc() != null && pSp.getDesc().getLvlGroundMgr() != null) {
 			grounds[ pSp.getDesc().getLvlGroundMgr().getId()].remSpriteDisplay( pSp);
@@ -191,14 +196,16 @@ class MySpriteMgr {
 	 * @param	pDT	delta t en ms
 	 */
 	public function doFrame( pDT : Float) : Void {
-		var lSp	: MySpFrame;
+		var lSps	: Array<MySpFrame>;
+		var lSp		: MySpFrame;
 		
 		_ctrTime += pDT;
 		_ctrFrame++;
 		
 		slideToCamera();
 		
-		for ( lSp in spFrames) lSp.doFrame( pDT);
+		lSps = spFrames.copy();
+		for ( lSp in lSps) lSp.doFrame( pDT);
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 package vega.sprites;
 import pixi.core.math.Point;
+import vega.assets.AssetsMgr;
 import vega.utils.RectangleIJ;
 
 /**
@@ -12,6 +13,7 @@ class MyCell {
 	var _dx									: Float;
 	var _dy									: Float;
 	var _scale								: Point;
+	var _rot								: Float;
 	var _dHint								: Float;
 	var _cellOffset							: RectangleIJ;
 	var _instanceId							: String;
@@ -21,7 +23,7 @@ class MyCell {
 	
 	var _sprites							: Array<MySprite>;
 	
-	public function new( pI : Int, pJ : Int, pDX : Float, pDY : Float, pD : Float, pCellOffset : RectangleIJ, pLvlGroundMgr : LvlGroundMgr, pInstanceId : String = null, pSpId : String = null, pSpClass : Class<MySprite> = null, pScale : Point = null) {
+	public function new( pI : Int, pJ : Int, pDX : Float, pDY : Float, pD : Float, pCellOffset : RectangleIJ, pLvlGroundMgr : LvlGroundMgr, pInstanceId : String = null, pSpId : String = null, pSpClass : Class<MySprite> = null, pScale : Point = null, pRot : Float = 0) {
 		_i				= pI;
 		_j				= pJ;
 		_dx				= pDX;
@@ -30,9 +32,11 @@ class MyCell {
 		_cellOffset		= pCellOffset;
 		_instanceId		= pInstanceId;
 		_spId			= pSpId;
-		_spClass		= pSpClass;// pSpClass != null ? pSpClass : ApplicationDomain.currentDomain.getDefinition( AssetsMgr.getInstance().getAssetDescById( pSpId).getData( "spClass")) as Class;
+		_spClass		= pSpClass != null ? pSpClass : cast Type.resolveClass( AssetsMgr.instance.getAssetDescById( pSpId).getData( "class"));
+		
 		_lvlGroundMgr	= pLvlGroundMgr;
 		_scale			= pScale;
+		_rot			= pRot;
 		
 		_sprites		= new Array<MySprite>();
 	}
@@ -49,7 +53,8 @@ class MyCell {
 			_instanceId,
 			_spId,
 			_spClass,
-			_scale.clone()
+			_scale.clone(),
+			_rot
 		);
 		
 		return lDesc;
@@ -62,6 +67,9 @@ class MyCell {
 			lSp.scale.x	= _scale.x;
 			lSp.scale.y	= _scale.y;
 		}
+		
+		lSp.skew.x	= -_rot;
+		lSp.skew.y	= _rot;
 		
 		_sprites.push( lSp);
 		
@@ -92,6 +100,7 @@ class MyCell {
 	public function getDx() : Float { return _dx; }
 	public function getDy() : Float { return _dy; }
 	public function getScale() : Point { return _scale; }
+	public function getRot() : Float { return _rot; }
 	public function getInstanceId() : String { return _instanceId; }
 	public function getLvlGroundMgr() : LvlGroundMgr { return _lvlGroundMgr; }
 	public function getDHint() : Float { return _dHint; }

@@ -3,6 +3,7 @@ package vega.assets;
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
 import vega.utils.UtilsFlump;
+import haxe.extern.EitherType;
 
 /**
  * ...
@@ -25,9 +26,9 @@ class AssetInstance extends Container {
 		}
 	}
 	
-	override public function destroy() : Void {
+	override public function destroy( ?options : EitherType<Bool,DestroyOptions>) : Void {
 		if ( _export != null){
-			removeChild( _export);
+			if( _export.parent != null) _export.parent.removeChild( _export);
 			//_export.destroy( true); // pas de sens pour les png car géré déjà par fichier, provoque un bug de détruire texture de base alors qu'on a juste une instance en trop ; ni pour flump géré par les atlas
 			_export.destroy();
 			_export = null;

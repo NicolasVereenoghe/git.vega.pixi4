@@ -9,7 +9,7 @@ import pixi.core.graphics.Graphics;
 import pixi.core.math.shapes.Rectangle;
 import pixi.core.text.Text;
 import pixi.core.utils.Utils;
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import pixi.plugins.app.Application;
 import vega.utils.UtilsPixi;
 
@@ -55,6 +55,9 @@ class ApplicationMatchSize extends Application {
 	var _container								: Container;
 	var _borders								: Graphics		= null;
 	var _bg										: Graphics;
+	
+	var _tmpW									: Float			= -1;
+	var _tmpH									: Float			= -1;
 	
 	/** conteneur de trace de debug ; null si pas encore construit */
 	var _debugContainer							: Container		= null;
@@ -160,13 +163,13 @@ class ApplicationMatchSize extends Application {
 	 * capture switch affichage de trace
 	 * @param	pE	target de click
 	 */
-	function onBtSwitchTrace( pE : EventTarget) : Void { _debugContainer.visible = ! _debugContainer.visible; }
+	function onBtSwitchTrace( pE : InteractionEvent) : Void { _debugContainer.visible = ! _debugContainer.visible; }
 	
 	/**
 	 * capture cls de trace
 	 * @param	pE	tacraget de click
 	 */
-	function onBtClsTrace( pE : EventTarget) : Void {
+	function onBtClsTrace( pE : InteractionEvent) : Void {
 		_debugCtrLine = 0;
 		
 		while ( _debugContainer.children.length > 0) _debugContainer.removeChildAt( 0).destroy();
@@ -233,18 +236,30 @@ class ApplicationMatchSize extends Application {
 		set_fps( pFPS);
 	}
 	
+	/** fps arbitraire défini pour l'application ; c'est virtuel, le rendu pixi est déjà configué par défaut (souvent à 60) */
+	public var fps( get, set)		: Int;
+	var _fps						: Int								= -1;
+	function get_fps() : Int { return _fps; }
+	function set_fps( pFPS : Int) : Int {
+		// NON ! juste un getter : app.ticker.FPS = pFPS;
+		// peut-on modifier ce fps courrant d'une certaine manière ?
+		
+		return _fps = pFPS;
+	}
+	
 	/**
 	 * on demande à la page de recharger l'appli ; ne fonction que dans un context de browser
 	 * @return	true si la demande aboutit, false sinon
 	 */
 	public function reload() : Bool {
-		var lId	: String;
+		//var lId	: String;
 		
 		if ( Browser.supported){
 			try{
 				traceDebug( "WARNING : ApplicationMatchSize::reload");
 				
-				for ( lId in Reflect.fields( Utils.TextureCache)) Reflect.field( Utils.TextureCache, lId).destroy( true);
+				//for ( lId in Reflect.fields( Utils.TextureCache)) Reflect.field( Utils.TextureCache, lId).destroy( true);
+				Utils.destroyTextureCache();
 			}catch ( pE : Dynamic) traceDebug( "ERROR : ApplicationMatchSize::reload : clear textures failure");
 			
 			stage.interactiveChildren	= false;
@@ -267,6 +282,11 @@ class ApplicationMatchSize extends Application {
 		renderer.resize( 1, 1);
 		_onWindowResize( null);
 	}
+	
+	/**
+	 * hack pour éviter le clignotement sur de vieux devices ; on force un resize à la taille actuelle ; à appeler une fois quand on est au title screen
+	 */
+	public function antiFlicker() : Void { renderer.resize( width, height); }
 	
 	/**
 	 * on force la réinitialisation des interactions de bouton / touche
@@ -296,10 +316,10 @@ class ApplicationMatchSize extends Application {
 		backgroundColor = getStageBGColor();
 		
 		// hack samsung flicker
-		try{
+		/*try{
 			var lPixi:Dynamic = untyped __js__("PIXI");
 			lPixi.glCore.VertexArrayObject.FORCE_NATIVE = true;
-		}catch( pE : Dynamic) { trace( pE); }
+		}catch( pE : Dynamic) { trace( pE); }*/
 		
 		start();
 		
@@ -334,16 +354,43 @@ class ApplicationMatchSize extends Application {
 	function getBGColor() : Int { return 0xFFFFFF; }
 	function getStageBGColor() : Int { return 0x000000; }
 	
+	override function _onWindowResize( pE : Event) {
+		var lW		: Float	= Browser.window.innerWidth;
+		var lH		: Float	= Browser.window.innerHeight;
+		var lIsUp	: Bool	= ( pE == null);
+		
+		if ( _tmpW < 0 || Math.round( lW) != Math.round( _tmpW) && Browser.window.outerWidth != 0){
+			_tmpW	= width = lW;
+			lIsUp	= true;
+		}
+		
+		if ( _tmpH < 0 || Math.round( lH) != Math.round( _tmpH) && Browser.window.outerHeight != 0){
+			_tmpH	= height = lH;
+			lIsUp	= true;
+		}
+		
+		if ( ! lIsUp) return;
+		
+		app.renderer.resize( width, height);
+		
+		canvas.style.width	= width + "px";
+		canvas.style.height	= height + "px";
+
+		if ( onResize != null) onResize();
+	}
+	
 	function updateSize() : Void {
 		var lNewW	: Float	= width;
 		var lNewH	: Float	= lNewW * _MIN_HEIGHT / _MIN_WIDTH;
 		
-		if ( lNewH > height) {
-			lNewW	= height * _MIN_WIDTH / _MIN_HEIGHT;
-			lNewH	= height;
-		}
+		if ( lNewH > height) lNewW = height * _MIN_WIDTH / _MIN_HEIGHT;
 		
 		_baseScale			= lNewW / _MIN_WIDTH;
+		
+		lNewW				= Math.min( width / _baseScale, _EXT_WIDTH);
+		lNewH				= Math.min( height / _baseScale, _EXT_HEIGHT);
+		
+		_screenRect			= new Rectangle( -lNewW / 2, -lNewH / 2, lNewW, lNewH);
 		
 		_container.scale.x	= _baseScale;
 		_container.scale.y	= _baseScale;
@@ -357,11 +404,6 @@ class ApplicationMatchSize extends Application {
 		cast( _hit.getChildAt( 0), Graphics).width	= width / _baseScale;
 		cast( _hit.getChildAt( 0), Graphics).height	= height / _baseScale;
 		
-		lNewW				= Math.min( width / _baseScale, _EXT_WIDTH);
-		lNewH				= Math.min( height / _baseScale, _EXT_HEIGHT);
-		
-		_screenRect			= new Rectangle( -lNewW / 2, -lNewH / 2, lNewW, lNewH);
-		
 		if ( _borders == null){
 			_borders	= new Graphics();
 			
@@ -374,6 +416,8 @@ class ApplicationMatchSize extends Application {
 			
 			_container.addChild( _borders);
 		}
+		
+		traceDebug( "INFO : ApplicationMatchSize::updateSize : scale=" + ( Math.round( _baseScale * 100) / 100) + " ; screen=" + Math.round( _screenRect.width) + "x" + Math.round( _screenRect.height) + " ; stage=" + width + "x" + height, true);
 		
 		if ( _debugContainer != null){
 			_debugContainer.x	= _screenRect.x;

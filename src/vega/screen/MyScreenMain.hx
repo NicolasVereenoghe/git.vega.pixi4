@@ -2,7 +2,7 @@ package vega.screen;
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
 import pixi.flump.Movie;
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import vega.local.LocalMgr;
 import vega.ui.MyButtonFlump;
 import vega.utils.UtilsFlump;
@@ -78,7 +78,7 @@ class MyScreenMain extends MyScreen {
 	
 	override function launchAfterInit() : Void { shell.onScreenReady( this); }
 	
-	function onBtStart( pE : EventTarget) : Void {
+	function onBtStart( pE : InteractionEvent) : Void {
 		shell.onScreenClose( this);
 		
 		setModeFadeOut();

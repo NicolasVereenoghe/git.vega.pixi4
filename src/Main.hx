@@ -1,6 +1,7 @@
 package;
 
 import labo.shell.MyShell;
+import pixi.core.Pixi;
 import vega.loader.file.MyFile;
 import vega.shell.ApplicationMatchSize;
 import vega.shell.BaseShell;
@@ -22,17 +23,6 @@ class Main extends ApplicationMatchSize {
 	public function new() {
 		super();
 		
-		//debugLvl = "INFO";
-		debug = true;
-		debugVisibleInit = true;
-		//debugMotifs = [ "VegaOrient"];
-		
-		setFPS( 60);
-		
-		version = "32";
-		
-		traceDebug( version, true);
-		
 		SndMgr.getInstance( .5);
 		
 		new GlobalPointer();
@@ -45,6 +35,23 @@ class Main extends ApplicationMatchSize {
 		VegaDeactivator.getInstance();
 	}
 	
+	override function init() {
+		//debugLvl = "INFO";
+		debug = true;
+		debugVisibleInit = true;
+		//debugMotifs = [ "VegaOrient"];
+		
+		setFPS( 60);
+		
+		version = "0";
+		
+		//autoResize = false;
+		
+		super.init();
+		
+		traceDebug( version + ";" + Pixi.VERSION, true);
+	}
+	
 	function startShell( pDT : Float) : Void {
 		VegaFramer.getInstance().remIterator( startShell);
 		
@@ -53,7 +60,7 @@ class Main extends ApplicationMatchSize {
 			getContent(),
 			new MyFile( "assets.json", null, MyFile.VERSION_NO_CACHE),
 			new MyFile( "local.xml", null, MyFile.VERSION_NO_CACHE),
-			{ "Comfortaa-Light": new MyFile( "comfortaa_light.css", null, MyFile.NO_VERSION)}
+			{ "Sadana Square": new MyFile( "SadanaSquare.css", null, MyFile.NO_VERSION)}
 		);
 		
 		//new Perf();

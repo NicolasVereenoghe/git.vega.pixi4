@@ -12,7 +12,7 @@ import pixi.core.textures.Texture;
 import pixi.flump.Movie;
 import pixi.flump.Resource;
 import pixi.flump.Sprite;
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import vega.assets.AssetInstance;
 import vega.assets.AssetsMgr;
 import vega.shell.ApplicationMatchSize;
@@ -42,6 +42,28 @@ class UtilsFlump {
 	}
 	
 	public static function getLayers( pCont : Movie) : Array<Layer> { return pCont.symbol.layers; }
+	
+	/**
+	 * teste de collision sur les clip de box contenu dans les layers du Movie passé
+	 * @param	pCont	movie conteneur de layers de box
+	 * @param	pXY		coordonnées dans repère du movie conteneur
+	 * @return	true si collision, false sinon
+	 */
+	public static function testHitMultiBox( pCont : Movie, pXY : Point) : Bool {
+		var lLayers	: Array<Layer>	= getLayers( pCont);
+		var lLayer	: Layer;
+		var lCoord	: Point;
+		var lBox	: Container;
+		
+		for ( lLayer in lLayers){
+			lBox	= pCont.getLayer( lLayer.name);
+			lCoord	= lBox.toLocal( pXY, pCont);
+			
+			if ( lBox.getLocalBounds().contains( lCoord.x, lCoord.y)) return true;
+		}
+		
+		return false;
+	}
 	
 	/**
 	 * on crée un clone d'un layer
@@ -253,13 +275,20 @@ class UtilsFlump {
 	 * @param	pCont			conteneur
 	 * @param	pIsLoop			true pour mettre le flag "loop" à true, sinon false
 	 * @param	pExcludeSubId	liste de d'affixes de noms de layer à exclure de la récursion ; null pour tout prendre
+	 * @param	pForce			par défaut on force le reset de "loop" ; si false, on arrête le traitement dès qu'on a trouvé un cas déjà traité (optim)
 	 */
-	public static function recursiveSetLoop( pCont : Container, pIsLoop : Bool, pExcludeLayerSubId : Array<String> = null) : Void {
+	public static function recursiveSetLoop( pCont : Container, pIsLoop : Bool, pExcludeLayerSubId : Array<String> = null, pForce : Bool = true) : Void {
 		var lChild		: DisplayObject;
 		var lStr		: String;
 		var lIsExclude	: Bool;
 		
-		if ( Std.is( pCont, Movie)) cast( pCont, Movie).loop = pIsLoop;
+		if ( Std.is( pCont, Movie)){
+			if ( pForce) cast( pCont, Movie).loop = pIsLoop;
+			else{
+				if ( cast( pCont, Movie).loop != pIsLoop) cast( pCont, Movie).loop = pIsLoop;
+				else return;
+			}
+		}
 		
 		for ( lChild in pCont.children){
 			if ( Std.is( lChild, Container)){
@@ -348,32 +377,39 @@ class UtilsFlump {
 		var lLayers	: Array<Layer>;
 		var lLayer	: Layer;
 		var lChild	: DisplayObject;
-		var lModel	: Container;
-		var lMasked	: DisplayObject;
-		var lMask	: Graphics;
-		var lRect	: Rectangle;
 		
 		if ( Std.is( pCont, Movie)){
 			lLayers = getLayersWithPrefixInMovie( "mask", cast pCont);
 			
-			for ( lLayer in lLayers){
-				lModel	= getLayer( lLayer.name, cast pCont);
-				lMasked	= pCont.getChildAt( pCont.getChildIndex( lModel) - 1);
-				lMask	= cast pCont.addChildAt( new Graphics(), pCont.getChildIndex( lModel));
-				lRect	= UtilsPixi.getParentBounds( lModel);
-				
-				lMask.beginFill( 0, 1);
-				lMask.drawRect( lRect.x, lRect.y, lRect.width, lRect.height);
-				lMask.endFill();
-				
-				lMasked.mask	= lMask;
-				lModel.visible	= false;
-			}
+			for ( lLayer in lLayers) setBoxMask( getLayer( lLayer.name, cast pCont));
 		}
 		
 		for ( lChild in pCont.children){
 			if ( Std.is( lChild, Container)) recursiveApplyMask( cast lChild);
 		}
+	}
+	
+	/**
+	 * on transforme le layer spécifié en masque de box, pour son layer juste en dessous
+	 * @param	pLayer	layer à utiliser comme modèle de masque de box
+	 * @return	instance de Graphics utilisée comme masque pour modéliser la boite englobante du layer spécifié
+	 */
+	public static function setBoxMask( pLayer : Container) : Graphics {
+		var lCont	: Container			= pLayer.parent;
+		var lMasked	: DisplayObject		= lCont.getChildAt( lCont.getChildIndex( pLayer) - 1);
+		var lMask	: Graphics			= cast lCont.addChildAt( new Graphics(), lCont.getChildIndex( pLayer));
+		var lRect	: Rectangle			= UtilsPixi.getParentBounds( pLayer);
+		
+		lMask.x = pLayer.x;
+		lMask.y = pLayer.y;
+		lMask.beginFill( 0, 1);
+		lMask.drawRect( lRect.x - pLayer.x, lRect.y - pLayer.y, lRect.width, lRect.height);
+		lMask.endFill();
+		
+		lMasked.mask	= lMask;
+		pLayer.visible	= false;
+		
+		return lMask;
 	}
 	
 	/**
@@ -405,12 +441,13 @@ class UtilsFlump {
 		return lBt;
 	}
 	
-	static function onBtFullscreen( pE : EventTarget) : Void {
+	static function onBtFullscreen( pE : InteractionEvent) : Void {
 		if ( FullScreenApi.supportsFullScreen){
 			if ( FullScreenApi.isFullScreen()){
 				FullScreenApi.cancelFullScreen();
 			}else {
 				FullScreenApi.requestFullScreen( Browser.document.documentElement);
+				//FullScreenApi.requestFullScreen( Browser.window.document.documentElement);
 			}
 		}
 	}

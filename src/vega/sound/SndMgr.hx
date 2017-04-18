@@ -158,8 +158,9 @@ class SndMgr {
 	 * @param	pSndId		identifiant de son
 	 * @param	pMode		mode de lecture du son, laisser null pour une lecture par défaut
 	 * @param	pDoUnlock	true pour désigner un son qui déverrouille les autres sons (iOS), sinon laisser false
+	 * @return	instance de son ouvert, null si échec
 	 */
-	public function play( pSndId : String, pMode : SndPlayMode = null, pDoUnlock : Bool = false) : Void {
+	public function play( pSndId : String, pMode : SndPlayMode = null, pDoUnlock : Bool = false) : SndInstance {
 		var lDesc	: SndDesc;
 		
 		ApplicationMatchSize.instance.traceDebug( "INFO : SndMgr::play : " + pSndId);
@@ -176,8 +177,11 @@ class SndMgr {
 			tracks[ pSndId] = new SndTrack( lDesc);
 		}
 		
-		if ( isUnlocked() || ( canUnlockSound() && pDoUnlock) || tracks[ pSndId].getDesc().getOptions().loop) tracks[ pSndId].play( pMode, ( ! isUnlocked()) && ( ! pDoUnlock));
-		else ApplicationMatchSize.instance.traceDebug( "WARNING : SndMgr::play : sounds locked, ignore " + pSndId);
+		if ( isUnlocked() || ( canUnlockSound() && pDoUnlock) || tracks[ pSndId].getDesc().getOptions().loop) return tracks[ pSndId].play( pMode, ( ! isUnlocked()) && ( ! pDoUnlock));
+		else{
+			ApplicationMatchSize.instance.traceDebug( "WARNING : SndMgr::play : sounds locked, ignore " + pSndId);
+			return null;
+		}
 	}
 	
 	/**

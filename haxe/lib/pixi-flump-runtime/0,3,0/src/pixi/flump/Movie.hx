@@ -10,6 +10,7 @@ import pixi.core.math.shapes.Rectangle;
 import pixi.core.sprites.Sprite;
 import pixi.core.ticker.Ticker;
 import pixi.flump.Resource;
+import haxe.extern.EitherType;
 
 
 @:access(pixi.flump.Resource)
@@ -400,8 +401,9 @@ class Movie extends Container implements IFlumpMovie {
 		emit("labelHit", label.name);
 	}
 	
-
-	override public function destroy(): Void {
+	// nouvelle signature de destroy, pixi v4.4
+	//override public function destroy(): Void {
+	override public function destroy( ?options : EitherType<Bool,DestroyOptions>) : Void {
 		stop();
 		onComplete = null;
 		for (layer in layers) layer.removeChildren();

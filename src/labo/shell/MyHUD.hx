@@ -3,7 +3,7 @@ package labo.shell;
 import pixi.core.display.Container;
 import pixi.core.math.shapes.Rectangle;
 import pixi.flump.Movie;
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import vega.assets.AssetInstance;
 import vega.assets.AssetsMgr;
 import vega.shell.ApplicationMatchSize;
@@ -77,7 +77,7 @@ class MyHUD implements IMyHUD {
 		);
 	}
 	
-	function onHelp( pE : EventTarget) : Void {
+	function onHelp( pE : InteractionEvent) : Void {
 		SndMgr.getInstance().play( "click");
 		
 		btHelp.reset();

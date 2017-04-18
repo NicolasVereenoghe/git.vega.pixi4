@@ -2,7 +2,7 @@ package vega.shell;
 import pixi.core.display.DisplayObject;
 import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import pixi.interaction.InteractionData;
 
 /**
@@ -14,9 +14,11 @@ class GlobalPointer {
 	public static var instance				: GlobalPointer;
 	
 	/** délai de timeout en ms d'une touche */
-	var TIMEOUT								: Float						= 1000;// 5000;
+	var TIMEOUT								: Float						= 5000;
 	/** délai de timeout en ms de souris */
-	var TIMEOUT_MOUSE						: Float						= 5000;
+	//var TIMEOUT_MOUSE						: Float						= 5000;
+	/** id arbitraire de touche sans id ; semble correspondre à la souris */
+	public static inline var DEFAULT_ID		: Int						= 421;
 	
 	/** flag indiquant que le pointeur actuel est de type "touchpad" (true) ou souris (false) */
 	public var isTouchpad					: Bool						= false;
@@ -41,7 +43,7 @@ class GlobalPointer {
 		lAnchor.on( "mousedown", onMouseDown);
 		lAnchor.on( "mouseup", onMouseUp);
 		lAnchor.on( "mouseupoutside", onMouseUp);
-		lAnchor.on( "mouseout", onMouseUp);
+		//lAnchor.on( "mouseout", onMouseUp);
 		lAnchor.on( "mousemove", onMouseMove);
 		
 		lAnchor.on( "touchstart", onTouchDown);
@@ -95,21 +97,26 @@ class GlobalPointer {
 	public function getTouchId( pId : Int) : TouchDesc {
 		var lTouch	: TouchDesc;
 		
+		if ( pId == null) pId = DEFAULT_ID;
+		
 		for ( lTouch in datas) if ( lTouch.id == pId) return lTouch;
 		
 		return null;
 	}
 	
 	/**
-	 * on essaye de retrouver une touche à partir d'un event de touche, en comparant les coords
+	 * on essaye de retrouver une touche à partir d'un event de touche
 	 * @param	pE	event de touche
-	 * @param	pIsMouse	true si event venant de souris, false pour touch screen ; null pour rechercher dans toutes les touches
+	 * @param	pIsMouse	true si event venant de souris, sinon recherche d'identifiant sur toutes les touches
 	 * @return	descripteur de touche ou null si pas trouvé
 	 */
-	public function getTouchEvent( pE : EventTarget, pIsMouse : Bool) : TouchDesc {
-		if ( pIsMouse == null) return findNearestPos( pE.data.getLocalPosition( getRepere()), true);
+	public function getTouchEvent( pE : InteractionEvent, pIsMouse : Bool) : TouchDesc {
+		if ( pIsMouse) return getMouseTouch();
+		else return getTouchId( pE.data.identifier);
+		// sans InteractionData::identifier
+		/*if ( pIsMouse == null) return findNearestPos( pE.data.getLocalPosition( getRepere()), true);
 		else if ( pIsMouse) return getMouseTouch();
-		else return findNearestPos( pE.data.getLocalPosition( getRepere()));
+		else return findNearestPos( pE.data.getLocalPosition( getRepere()));*/
 	}
 	
 	/**
@@ -140,7 +147,7 @@ class GlobalPointer {
 	 * @param	pE			event de down
 	 * @param	pIsMouse	true pour désigner un event de souris, false pour le touchpad
 	 */
-	public function forceCaptureDown( pE : EventTarget, pIsMouse : Bool) : Void {
+	public function forceCaptureDown( pE : InteractionEvent, pIsMouse : Bool) : Void {
 		if ( pIsMouse) onMouseDown( pE);
 		else onTouchDown( pE);
 		
@@ -166,7 +173,7 @@ class GlobalPointer {
 			datas[ lI].delay += pDT;
 			
 			if ( datas[ lI].isMouse){
-				if ( datas[ lI].delay >= TIMEOUT_MOUSE) datas.remove( datas[ lI]);
+				//if ( datas[ lI].delay >= TIMEOUT_MOUSE) datas.remove( datas[ lI]);
 			}else{
 				if ( datas[ lI].delay >= TIMEOUT) datas.remove( datas[ lI]);
 			}
@@ -196,8 +203,8 @@ class GlobalPointer {
 	 */
 	public function getRepere() : DisplayObject { return ApplicationMatchSize.instance.getContent(); }
 	
-	function onTouchDown( pE : EventTarget) : Void {
-		datas.push( new TouchDesc( pE.data.getLocalPosition( getRepere()), false, true));
+	function onTouchDown( pE : InteractionEvent) : Void {
+		datas.push( new TouchDesc( pE.data.getLocalPosition( getRepere()), false, true, pE.data.identifier));
 		
 		//ApplicationMatchSize.instance.traceDebug( "INFO : GlobalPointer::onTouchDown : " + datas[ datas.length - 1].id, true);
 		//ApplicationMatchSize.instance.traceDebug( toString(), true);
@@ -205,34 +212,40 @@ class GlobalPointer {
 		checkTouchState();
 	}
 	
-	function onTouchUp( pE : EventTarget) : Void {
-		var lTouch	: TouchDesc	= findNearestPos( pE.data.getLocalPosition( getRepere()));
+	function onTouchUp( pE : InteractionEvent) : Void {
+		// sans InteractionData::identifier
+		//var lTouch	: TouchDesc	= findNearestPos( pE.data.getLocalPosition( getRepere()));
+		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
 		
 		if ( lTouch != null){
 			datas.remove( lTouch);
 			checkTouchState();
 		}
+		
+		//ApplicationMatchSize.instance.traceDebug( toString(), true);
 	}
 	
-	function onTouchMove( pE : EventTarget) : Void {
+	function onTouchMove( pE : InteractionEvent) : Void {
 		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
-		var lTouch	: TouchDesc	= findNearestPos( lPt);
+		// sans InteractionData::identifier
+		//var lTouch	: TouchDesc	= findNearestPos( lPt);
+		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
 		
 		if ( lTouch != null){
 			lTouch.coord	= lPt;
 			lTouch.delay	= 0;
 		}else{
-			datas.push( new TouchDesc( lPt, false, true));
+			datas.push( new TouchDesc( lPt, false, true, pE.data.identifier));
 			
 			checkTouchState();
 		}
 	}
 	
-	function onMouseDown( pE : EventTarget) : Void {
+	function onMouseDown( pE : InteractionEvent) : Void {
 		var lTouch	: TouchDesc	= getMouseTouch();
 		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
 		
-		if ( lTouch == null) datas.push( new TouchDesc( lPt, true, true));
+		if ( lTouch == null) datas.push( new TouchDesc( lPt, true, true, pE.data.identifier));
 		else {
 			lTouch.coord	= lPt;
 			lTouch.delay	= 0;
@@ -240,12 +253,12 @@ class GlobalPointer {
 		}
 		
 		//ApplicationMatchSize.instance.traceDebug( "INFO : GlobalPointer::onMouseDown : " + lTouch.id, true);
-		//ApplicationMatchSize.instance.traceDebug( toString(), true);
+		//ApplicationMatchSize.instance.traceDebug( pE.data.identifier + " : d : " + toString(), true);
 		
 		checkTouchState();
 	}
 	
-	function onMouseUp( pE : EventTarget) : Void {
+	function onMouseUp( pE : InteractionEvent) : Void {
 		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
 		var lTouch	: TouchDesc	= getMouseTouch();
 		
@@ -254,13 +267,16 @@ class GlobalPointer {
 			lTouch.delay	= 0;
 			lTouch.isDown	= false;
 		}else{
-			datas.push( new TouchDesc( lPt, true, false));
+			datas.push( new TouchDesc( lPt, true, false, pE.data.identifier));
 		}
+		
+		//ApplicationMatchSize.instance.traceDebug( "INFO : GlobalPointer::onMouseUp", true);
+		//ApplicationMatchSize.instance.traceDebug( pE.data.identifier + " : u : " + toString(), true);
 		
 		checkTouchState();
 	}
 	
-	function onMouseMove( pE : EventTarget) : Void {
+	function onMouseMove( pE : InteractionEvent) : Void {
 		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
 		var lTouch	: TouchDesc	= getMouseTouch();
 		
@@ -268,7 +284,7 @@ class GlobalPointer {
 			lTouch.coord	= lPt;
 			lTouch.delay	= 0;
 		}else{
-			datas.push( new TouchDesc( lPt, true, false));
+			datas.push( new TouchDesc( lPt, true, false, pE.data.identifier));
 			
 			checkTouchState();
 		}
@@ -280,13 +296,14 @@ class GlobalPointer {
 	 */
 	function getEventAnchor() : DisplayObject { return ApplicationMatchSize.instance.stage; }
 	
+	// sans InteractionData::identifier
 	/**
 	 * on recherche la touche la plus proche du point précisé ; par défaut, méthode dédiée au touchpad
 	 * @param	pPos		position de recherche
 	 * @param	pDoMouse	true pour inclure la souris à la recherche, false si que le touch pad
 	 * @return	touche enregistrée la plus proche, ou null si rien de trouvé
 	 */
-	function findNearestPos( pPos : Point, pDoMouse : Bool = false) : TouchDesc {
+	/*function findNearestPos( pPos : Point, pDoMouse : Bool = false) : TouchDesc {
 		var lDist	: Float		= -1;
 		var lRes	: TouchDesc	= null;
 		var lTmp	: Float;
@@ -304,7 +321,7 @@ class GlobalPointer {
 		}
 		
 		return lRes;
-	}
+	}*/
 	
 	/**
 	 * on récupère la ref sur la touche de la souris
@@ -326,10 +343,10 @@ class GlobalPointer {
 	function checkTouchState() : Void {
 		if ( datas.length > 0){
 			if ( datas[ 0].isMouse){
-				isTouchpad	= true;
+				isTouchpad	= false;
 				isDown		= datas[ 0].isDown;
 			}else{
-				isTouchpad	= false;
+				isTouchpad	= true;
 				isDown		= true;
 			}
 		}else isDown = false;
@@ -340,7 +357,7 @@ class GlobalPointer {
  * descripteur de touche
  */
 class TouchDesc {
-	static var ctrTouch			: Int				= 0;
+	//static var ctrTouch			: Int				= 0;
 	
 	public var coord			: Point;
 	public var delay			: Float;
@@ -350,11 +367,12 @@ class TouchDesc {
 	
 	public var isBound			: Bool				= false;
 	
-	public function new( pCoord : Point, pIsMouse : Bool, pIsDown : Bool) {
+	public function new( pCoord : Point, pIsMouse : Bool, pIsDown : Bool, pId : Int) {
 		coord	= pCoord;
 		isMouse	= pIsMouse;
 		delay	= 0;
 		isDown	= pIsDown;
-		id		= ctrTouch++;
+		//id		= ctrTouch++;
+		id		= pId != null ? pId : GlobalPointer.DEFAULT_ID;
 	}
 }

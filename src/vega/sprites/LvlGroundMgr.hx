@@ -106,7 +106,7 @@ class LvlGroundMgr {
 		return lRes2;
 	}
 	
-	public function createCell( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pIsSave : Bool = false) : MyCell {
+	public function createCell( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pIsSave : Bool = false, pRot : Float = 0) : MyCell {
 		var lModX	: Float		= x2ModX( pX);
 		var lModY	: Float		= y2ModY( pY);
 		var lI		: Int		= x2i( lModX);
@@ -122,7 +122,8 @@ class LvlGroundMgr {
 			pInstanceID != null ? pInstanceID : _id + ctrCells,
 			pSpID,
 			pSpClass,
-			pScale
+			pScale,
+			pRot
 		);
 		
 		if ( pIsSave) restoreCells.push( lCell.clone());

@@ -1,5 +1,5 @@
 /*
-* Copyright (C)2005-2012 Haxe Foundation
+* Copyright (C)2005-2017 Haxe Foundation
 *
 * Permission is hereby granted, free of charge, to any person obtaining a
 * copy of this software and associated documentation files (the "Software"),
@@ -27,6 +27,7 @@ import haxe.io.BytesData;
 import python.Exceptions;
 import python.Tuple;
 import python.lib.net.Socket in PSocket;
+import python.lib.net.Socket.SocketModule in PSocketModule;
 import python.lib.net.Address in PAddress;
 import python.lib.Select;
 
@@ -92,7 +93,7 @@ private class SocketOutput extends haxe.io.Output {
     public override function writeBytes( buf : haxe.io.Bytes, pos : Int, len : Int) : Int {
         try {
             var data    = buf.getData();
-            var payload = python.Syntax.pythonCode("data[pos:pos+len]");
+            var payload = python.Syntax.pythonCode("data[{0}:{0}+{1}]", pos, len);
             var r = __s.send(payload,0);
             return r;
         } catch( e : BlockingIOError ) {
@@ -115,7 +116,7 @@ private class SocketOutput extends haxe.io.Output {
     var __s:PSocket;
     /**
         The stream on which you can read available data. By default the stream is blocking until the requested data is available,
-        use [setBlocking(false)] or [setTimeout] to prevent infinite waiting.
+        use `setBlocking(false)` or `setTimeout` to prevent infinite waiting.
     **/
     public var input(default,null) : haxe.io.Input;
 
@@ -125,7 +126,7 @@ private class SocketOutput extends haxe.io.Output {
     public var output(default,null) : haxe.io.Output;
 
     /**
-        A custom value that can be associated with the socket. Can be used to retreive your custom infos after a [select].
+        A custom value that can be associated with the socket. Can be used to retrieve your custom infos after a `select`.
     ***/
     public var custom : Dynamic;
 
@@ -163,7 +164,7 @@ private class SocketOutput extends haxe.io.Output {
     }
 
     /**
-        Connect to the given server host/port. Throw an exception in case we couldn't sucessfully connect.
+        Connect to the given server host/port. Throw an exception in case we couldn't successfully connect.
     **/
     public function connect( host : Host, port : Int ) : Void {
         __init();
@@ -172,7 +173,7 @@ private class SocketOutput extends haxe.io.Output {
     }
 
     /**
-        Allow the socket to listen for incoming questions. The parameter tells how many pending connections we can have until they get refused. Use [accept()] to accept incoming connections.
+        Allow the socket to listen for incoming questions. The parameter tells how many pending connections we can have until they get refused. Use `accept()` to accept incoming connections.
     **/
     public function listen( connections : Int ) : Void {
         __s.listen(connections);
@@ -182,7 +183,7 @@ private class SocketOutput extends haxe.io.Output {
         Shutdown the socket, either for reading or writing.
     **/
     public function shutdown( read : Bool, write : Bool ) : Void
-        __s.shutdown( (read && write) ? PSocket.SHUT_RDWR : read ?  PSocket.SHUT_RD : PSocket.SHUT_WR  );
+        __s.shutdown( (read && write) ? PSocketModule.SHUT_RDWR : read ?  PSocketModule.SHUT_RD : PSocketModule.SHUT_WR  );
 
     /**
         Bind the socket to the given host/port so it can afterwards listen for connections there.
@@ -206,7 +207,7 @@ private class SocketOutput extends haxe.io.Output {
     }
 
     /**
-        Return the informations about the other side of a connected socket.
+        Return the information about the other side of a connected socket.
     **/
     public function peer() : { host : Host, port : Int } {
         var pn = __s.getpeername();
@@ -214,7 +215,7 @@ private class SocketOutput extends haxe.io.Output {
     }
 
     /**
-        Return the informations about our side of a connected socket.
+        Return the information about our side of a connected socket.
     **/
     public function host() : { host : Host, port : Int } {
         var pn = __s.getsockname();
@@ -236,14 +237,14 @@ private class SocketOutput extends haxe.io.Output {
     }
 
     /**
-        Change the blocking mode of the socket. A blocking socket is the default behavior. A non-blocking socket will abort blocking operations immediatly by throwing a haxe.io.Error.Blocking value.
+        Change the blocking mode of the socket. A blocking socket is the default behavior. A non-blocking socket will abort blocking operations immediately by throwing a haxe.io.Error.Blocking value.
     **/
     public function setBlocking( b : Bool ) : Void {
         __s.setblocking(b);
     }
 
     /**
-        Allows the socket to immediatly send the data when written to its output : this will cause less ping but might increase the number of packets / data size, especially when doing a lot of small writes.
+        Allows the socket to immediately send the data when written to its output : this will cause less ping but might increase the number of packets / data size, especially when doing a lot of small writes.
     **/
     public function setFastSend( b : Bool ) : Void {}
 
@@ -251,11 +252,11 @@ private class SocketOutput extends haxe.io.Output {
 
     /**
         Wait until one of the sockets groups is ready for the given operation :
-        [read] contains sockets on which we want to wait for available data to be read,
-        [write] contains sockets on which we want to wait until we are allowed to write some data to their output buffers,
-        [others] contains sockets on which we want to wait for exceptional conditions.
-        [select] will block until one of the condition is met, in which case it will return the sockets for which the condition was true.
-        In case a [timeout] (in seconds) is specified, select might wait at worse until the timeout expires.
+        - `read` contains sockets on which we want to wait for available data to be read,
+        - `write` contains sockets on which we want to wait until we are allowed to write some data to their output buffers,
+        - `others` contains sockets on which we want to wait for exceptional conditions.
+        - `select` will block until one of the condition is met, in which case it will return the sockets for which the condition was true.
+        In case a `timeout` (in seconds) is specified, select might wait at worse until the timeout expires.
     **/
     public static function select(read : Array<Socket>, write : Array<Socket>, others : Array<Socket>, ?timeout : Float) : { read: Array<Socket>,write: Array<Socket>,others: Array<Socket> } {
         var t3 = Select.select(read,write,others,timeout);

@@ -135,6 +135,8 @@ class BaseShell implements IShell {
 		ApplicationMatchSize.instance.traceDebug( "INFO : BaseShell::onShellReadyMain");
 		
 		setCurScreen( getScreenMain());
+		
+		ApplicationMatchSize.instance.antiFlicker();
 	}
 	
 	function setCurScreen( pScreen : MyScreen) : Void {

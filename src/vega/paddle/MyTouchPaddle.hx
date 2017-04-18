@@ -2,7 +2,7 @@ package vega.paddle;
 
 import pixi.core.display.DisplayObject;
 import pixi.core.math.Point;
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import pixi.interaction.InteractionData;
 import vega.paddle.MyTouchPaddle.TouchDesc;
 import vega.shell.ApplicationMatchSize;
@@ -437,7 +437,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 		return lDesc;
 	}
 	
-	function onTouchDown( pE : EventTarget) : Void {
+	function onTouchDown( pE : InteractionEvent) : Void {
 		var lData	: TouchDesc	= new TouchDesc( Std.string( pE.data.identifier), pE.data.getLocalPosition( getRepere()));
 		
 		if ( data != null && data.id != lData.id && data.id != TOUCH_MOUSE_ID){
@@ -448,7 +448,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 		}
 	}
 	
-	function onTouchUp( pE : EventTarget) : Void {
+	function onTouchUp( pE : InteractionEvent) : Void {
 		var lId		: String	= Std.string( pE.data.identifier);
 		
 		if ( data != null){
@@ -463,7 +463,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 		}
 	}
 	
-	function onTouchMove( pE : EventTarget) : Void {
+	function onTouchMove( pE : InteractionEvent) : Void {
 		var lId		: String	= Std.string( pE.data.identifier);
 		var lCoord	: Point		= pE.data.getLocalPosition( getRepere());
 		var lData	: TouchDesc;
@@ -480,18 +480,18 @@ class MyTouchPaddle implements IDirectionPaddle {
 		}else data = new TouchDesc( lId, lCoord);
 	}
 	
-	function onMouseDown( pE : EventTarget) : Void {
+	function onMouseDown( pE : InteractionEvent) : Void {
 		if( datas.length > 0) datas = [];
 		data = new TouchDesc( TOUCH_MOUSE_ID, pE.data.getLocalPosition( getRepere()));
 		
 	}
 	
-	function onMouseUp( pE : EventTarget) : Void {
+	function onMouseUp( pE : InteractionEvent) : Void {
 		if( datas.length > 0) datas = [];
 		data = null;
 	}
 	
-	function onMouseMove( pE : EventTarget) : Void {
+	function onMouseMove( pE : InteractionEvent) : Void {
 		if( datas.length > 0) datas = [];
 		
 		if ( data != null && data.id == TOUCH_MOUSE_ID){

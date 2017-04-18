@@ -1,6 +1,6 @@
 package labo.screen;
 
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import vega.screen.MyScreenMain;
 import vega.sound.SndMgr;
 
@@ -11,7 +11,7 @@ import vega.sound.SndMgr;
 class MyScreenMainInit extends MyScreenMain {
 	public function new() { super(); }
 	
-	override function onBtStart( pE : EventTarget) : Void {
+	override function onBtStart( pE : InteractionEvent) : Void {
 		SndMgr.getInstance().play( "click", null, true);
 		
 		super.onBtStart( pE);

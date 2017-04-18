@@ -1,4 +1,5 @@
 package vega.effect.diskbounce;
+import haxe.io.Error;
 import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import vega.utils.Utils;
@@ -67,6 +68,13 @@ class MyDiskBounce {
 	
 	public function testHitOnPt( pX : Float, pY : Float) : Bool { return ( x - pX) * ( x - pX) + ( y - pY) * ( y - pY) < ray * ray; }
 	
+	public function testHitOnDisk( pDisk : MyDiskBounce) : Bool {
+		var lDX		: Float	= pDisk.x - x;
+		var lDY		: Float	= pDisk.y - y;
+		
+		return ( lDX * lDX + lDY * lDY <= ( ray + pDisk.ray) * ( ray + pDisk.ray));
+	}
+	
 	public function doBounceWithDiskBounce( pDisk : MyDiskBounce, pReflectTransmit : Bool = true) : Bool {
 		var lDX		: Float	= pDisk.x - x;
 		var lDY		: Float	= pDisk.y - y;
@@ -80,7 +88,7 @@ class MyDiskBounce {
 			
 			if ( lDist > pDisk.ray + diskAbsorbOffset || lDist > ray + diskAbsorbOffset){
 				if( isPairsValid){
-					lDA		= Utils.modA( Math.acos( ( lDist * lDist + ray * ray - pDisk.ray * pDisk.ray) / ( 2 * lDist * ray)));
+					lDA		= Utils.modA( secureACos( ( lDist * lDist + ray * ray - pDisk.ray * pDisk.ray) / ( 2 * lDist * ray)));
 					
 					addBPair( Utils.modA( lA - lDA), Utils.modA( lA + lDA));
 				}
@@ -122,7 +130,7 @@ class MyDiskBounce {
 							// sortie par le haut
 							
 							if ( isPairsValid){
-								lDA = Math.acos( ( pBox.y - y) / ray);
+								lDA = secureACos( ( pBox.y - y) / ray);
 								
 								addBPair( Utils.modA( Math.PI / 2 - lDA), Utils.modA( Math.PI / 2 + lDA));
 							}else{
@@ -141,7 +149,7 @@ class MyDiskBounce {
 							// sortie par le bas
 							
 							if ( isPairsValid){
-								lDA = Math.acos( ( y - pBox.y - pBox.height) / ray);
+								lDA = secureACos( ( y - pBox.y - pBox.height) / ray);
 								
 								addBPair( Utils.modA( 3 * Math.PI / 2 - lDA), Utils.modA( 3 * Math.PI / 2 + lDA));
 							}else{
@@ -158,18 +166,18 @@ class MyDiskBounce {
 					}
 				}else{
 					if ( isPairsValid){
-						lDA		= Math.acos( ( x - pBox.x - pBox.width) / ray);
+						lDA		= secureACos( ( x - pBox.x - pBox.width) / ray);
 						lALeft	= Utils.modA( Math.PI - lDA);
 						lARight	= Utils.modA( Math.PI + lDA);
 						
 						if ( y - ray < pBox.y - diskAbsorbOffset){
-							lDA = Utils.modA( Math.PI / 2 + Math.acos( ( pBox.y - y) / ray));
+							lDA = Utils.modA( Math.PI / 2 + secureACos( ( pBox.y - y) / ray));
 							
 							if ( Utils.modA( lARight - lALeft) > Utils.modA( lDA - lALeft)) lARight = lDA;
 						}
 						
 						if ( y + ray > pBox.y + pBox.height + diskAbsorbOffset){
-							lDA = Utils.modA( 3 * Math.PI / 2 - Math.acos( ( y - pBox.y - pBox.height) / ray));
+							lDA = Utils.modA( 3 * Math.PI / 2 - secureACos( ( y - pBox.y - pBox.height) / ray));
 							
 							if ( Utils.modA( lARight - lALeft) > Utils.modA( lARight - lDA)) lALeft = lDA;
 						}
@@ -195,7 +203,7 @@ class MyDiskBounce {
 							// sortie par la gauche
 							
 							if ( isPairsValid){
-								lDA = Math.acos( ( pBox.x - x) / ray);
+								lDA = secureACos( ( pBox.x - x) / ray);
 								
 								addBPair( Utils.modA( -lDA), Utils.modA( lDA));
 							}else{
@@ -214,7 +222,7 @@ class MyDiskBounce {
 							// sortie par la droite
 							
 							if ( isPairsValid){
-								lDA = Math.acos( ( x - pBox.x - pBox.width) / ray);
+								lDA = secureACos( ( x - pBox.x - pBox.width) / ray);
 								
 								addBPair( Utils.modA( Math.PI - lDA), Utils.modA( Math.PI + lDA));
 							}else{
@@ -231,18 +239,18 @@ class MyDiskBounce {
 					}
 				}else{
 					if ( isPairsValid){
-						lDA		= Math.acos( ( pBox.y - y) / ray);
+						lDA		= secureACos( ( pBox.y - y) / ray);
 						lALeft	= Utils.modA( Math.PI / 2 - lDA);
 						lARight	= Utils.modA( Math.PI / 2 + lDA);
 						
 						if ( x - ray < pBox.x - diskAbsorbOffset){
-							lDA = Utils.modA( Math.acos( ( pBox.x - x) / ray));
+							lDA = Utils.modA( secureACos( ( pBox.x - x) / ray));
 							
 							if ( Utils.modA( lARight - lALeft) > Utils.modA( lDA - lALeft)) lARight = lDA;
 						}
 						
 						if ( x + ray > pBox.x + pBox.width + diskAbsorbOffset){
-							lDA = Utils.modA( Math.PI - Math.acos( ( x - pBox.x - pBox.width) / ray));
+							lDA = Utils.modA( Math.PI - secureACos( ( x - pBox.x - pBox.width) / ray));
 							
 							if ( Utils.modA( lARight - lALeft) > Utils.modA( lARight - lDA)) lALeft = lDA;
 						}
@@ -270,7 +278,7 @@ class MyDiskBounce {
 							// sortie par le haut
 							
 							if ( isPairsValid){
-								lDA = Math.acos( ( pBox.y - y) / ray);
+								lDA = secureACos( ( pBox.y - y) / ray);
 								
 								addBPair( Utils.modA( Math.PI / 2 - lDA), Utils.modA( Math.PI / 2 + lDA));
 							}else{
@@ -289,7 +297,7 @@ class MyDiskBounce {
 							// sortie par la bas
 							
 							if ( isPairsValid){
-								lDA = Math.acos( ( y - pBox.y - pBox.height) / ray);
+								lDA = secureACos( ( y - pBox.y - pBox.height) / ray);
 								
 								addBPair( Utils.modA( 3 * Math.PI / 2 - lDA), Utils.modA( 3 * Math.PI / 2 + lDA));
 							}else{
@@ -306,18 +314,18 @@ class MyDiskBounce {
 					}
 				}else{
 					if ( isPairsValid){
-						lDA		= Math.acos( ( pBox.x - x) / ray);
+						lDA		= secureACos( ( pBox.x - x) / ray);
 						lALeft	= Utils.modA( -lDA);
 						lARight	= Utils.modA( lDA);
 						
 						if ( y - ray < pBox.y - diskAbsorbOffset){
-							lDA = Utils.modA( Math.PI / 2 - Math.acos( ( pBox.y - y) / ray));
+							lDA = Utils.modA( Math.PI / 2 - secureACos( ( pBox.y - y) / ray));
 							
 							if ( Utils.modA( lARight - lALeft) > Utils.modA( lARight - lDA)) lALeft = lDA;
 						}
 						
 						if ( y + ray > pBox.y + pBox.height + diskAbsorbOffset){
-							lDA = Utils.modA( 3 * Math.PI / 2 + Math.acos( ( y - pBox.y - pBox.height) / ray));
+							lDA = Utils.modA( 3 * Math.PI / 2 + secureACos( ( y - pBox.y - pBox.height) / ray));
 							
 							if ( Utils.modA( lARight - lALeft) > Utils.modA( lDA - lALeft)) lARight = lDA;
 						}
@@ -343,7 +351,7 @@ class MyDiskBounce {
 							// sortie par la gauche
 							
 							if ( isPairsValid){
-								lDA = Math.acos( ( pBox.x - x) / ray);
+								lDA = secureACos( ( pBox.x - x) / ray);
 								
 								addBPair( Utils.modA( -lDA), Utils.modA( lDA));
 							}else{
@@ -362,7 +370,7 @@ class MyDiskBounce {
 							// sortie par la droite
 							
 							if ( isPairsValid){
-								lDA = Math.acos( ( x - pBox.x - pBox.width) / ray);
+								lDA = secureACos( ( x - pBox.x - pBox.width) / ray);
 								
 								addBPair( Utils.modA( Math.PI - lDA), Utils.modA( Math.PI + lDA));
 							}else{
@@ -379,18 +387,18 @@ class MyDiskBounce {
 					}
 				}else{
 					if ( isPairsValid){
-						lDA		= Math.acos( ( y - pBox.y - pBox.height) / ray);
+						lDA		= secureACos( ( y - pBox.y - pBox.height) / ray);
 						lALeft	= Utils.modA( 3 * Math.PI / 2 - lDA);
 						lARight	= Utils.modA( 3 * Math.PI / 2 + lDA);
 						
 						if ( x - ray < pBox.x - diskAbsorbOffset){
-							lDA = Utils.modA( -Math.acos( ( pBox.x - x) / ray));
+							lDA = Utils.modA( -secureACos( ( pBox.x - x) / ray));
 							
 							if ( Utils.modA( lARight - lALeft) > Utils.modA( lARight - lDA)) lALeft = lDA;
 						}
 						
 						if ( x + ray > pBox.x + pBox.width + diskAbsorbOffset){
-							lDA = Utils.modA( Math.PI + Math.acos( ( x - pBox.x) / ray));
+							lDA = Utils.modA( Math.PI + secureACos( ( x - pBox.x) / ray));
 							
 							if ( Utils.modA( lARight - lALeft) > Utils.modA( lDA - lALeft)) lARight = lDA;
 						}
@@ -431,7 +439,7 @@ class MyDiskBounce {
 			// gauche
 			
 			if ( x + ray > pBox.x + diskAbsorbOffset && isPairsValid){
-				lDA = Math.acos( ( x - pBox.x) / ray);
+				lDA = secureACos( ( x - pBox.x) / ray);
 				
 				addBPair( Utils.modA( Math.PI - lDA), Utils.modA( Math.PI + lDA));
 			}else{
@@ -449,7 +457,7 @@ class MyDiskBounce {
 			// droite
 			
 			if ( x - ray < pBox.x + pBox.width - diskAbsorbOffset && isPairsValid){
-				lDA = Math.acos( ( pBox.x + pBox.width - x) / ray);
+				lDA = secureACos( ( pBox.x + pBox.width - x) / ray);
 				
 				addBPair( Utils.modA( -lDA), Utils.modA( lDA));
 			}else{
@@ -469,7 +477,7 @@ class MyDiskBounce {
 			// haut
 			
 			if ( y + ray > pBox.y + diskAbsorbOffset && isPairsValid){
-				lDA = Math.acos( ( y - pBox.y) / ray);
+				lDA = secureACos( ( y - pBox.y) / ray);
 				
 				addBPair( Utils.modA( 3 * Math.PI / 2 - lDA), Utils.modA( 3 * Math.PI / 2 + lDA));
 			}else{
@@ -487,7 +495,7 @@ class MyDiskBounce {
 			// bas
 			
 			if ( y - ray < pBox.y + pBox.height - diskAbsorbOffset && isPairsValid){
-				lDA = Math.acos( ( pBox.y + pBox.height - y) / ray);
+				lDA = secureACos( ( pBox.y + pBox.height - y) / ray);
 				
 				addBPair( Utils.modA( Math.PI / 2 - lDA), Utils.modA( Math.PI / 2 + lDA));
 			}else{
@@ -516,6 +524,27 @@ class MyDiskBounce {
 		return doBounce();
 	}
 	
+	public function doPhys() : Void {
+		var lLen	: Float;
+		
+		vx	+= ( accFX - vx * frot) / masse;
+		vy	+= ( accFY - vy * frot) / masse;
+		
+		lLen = vx * vx + vy * vy;
+		if ( lLen > maxV * maxV){
+			lLen	= Math.sqrt( lLen);
+			
+			vx	*= maxV / lLen;
+			vy	*= maxV / lLen;
+		}
+		
+		accFX	= 0;
+		accFY	= 0;
+		
+		x		+= vx;	
+		y		+= vy;
+	}
+	
 	public function doBounce() : Bool {
 		var lIsBounce	: Bool	= false;
 		
@@ -534,6 +563,15 @@ class MyDiskBounce {
 		flush();
 		
 		return lIsBounce;
+	}
+	
+	public function halt() : Void {
+		vx = 0;
+		vy = 0;
+		accFX = 0;
+		accFY = 0;
+		
+		flush();
 	}
 	
 	function onSpeedReflected( pByDisk : MyDiskBounce) : Void { }
@@ -620,27 +658,6 @@ class MyDiskBounce {
 		}
 	}
 	
-	function doPhys() : Void {
-		var lLen	: Float;
-		
-		vx	+= ( accFX - vx * frot) / masse;
-		vy	+= ( accFY - vy * frot) / masse;
-		
-		lLen = vx * vx + vy * vy;
-		if ( lLen > maxV * maxV){
-			lLen	= Math.sqrt( lLen);
-			
-			vx	*= maxV / lLen;
-			vy	*= maxV / lLen;
-		}
-		
-		accFX	= 0;
-		accFY	= 0;
-		
-		x		+= vx;	
-		y		+= vy;
-	}
-	
 	function extrapolateLongestPair() : Point {
 		var lRes		: Point	= new Point( bPairs[ 0].x, bPairs[ bPairs.length - 1].y);
 		var lFreeLen	: Float	= Utils.modA( lRes.x - lRes.y);
@@ -708,5 +725,11 @@ class MyDiskBounce {
 			vx	-= lScalar * pCos * ( 1 + globalBounceCoef);
 			vy	-= lScalar * pSin * ( 1 + globalBounceCoef);
 		}
+	}
+	
+	function secureACos( pVal : Float) : Float {
+		if ( pVal <= -1) return Math.PI;
+		else if ( pVal >= 1) return 0;
+		else return Math.acos( pVal);
 	}
 }

@@ -32,7 +32,7 @@ class GroundMgr {
 	var clipRectIn									: Int -> Int -> Int -> Int -> Void;
 	var clipRectOut									: Int -> Int -> Int -> Int -> RectangleIJ -> Void;
 	
-	public var addSpriteCell						: Float -> Float -> Float -> RectangleIJ -> String -> Class<MySprite> -> String -> Point -> Bool -> MyCell;
+	public var addSpriteCell						: Float -> Float -> Float -> RectangleIJ -> String -> Class<MySprite> -> String -> Point -> Bool -> Float -> MyCell;
 	public var remSpriteCell						: MyCell -> Void;
 	
 	public var getSpriteCell						: MyCell -> PointIJ -> Array<MySprite>;
@@ -86,6 +86,8 @@ class GroundMgr {
 	
 	public function getSprites() : Map<String,MySprite> { return sprites; }
 	
+	public function getContainer() : Container { return container; }
+	
 	public function addSpriteDisplay( pSp : MySprite, pX : Float, pY : Float, pID : String, pDesc : MyCell) : Void {
 		pSp.x			= pX;
 		pSp.y			= pY;
@@ -99,9 +101,9 @@ class GroundMgr {
 	}
 	
 	public function remSpriteDisplay( pSp : MySprite) : Void {
-		pSp.destroy();
-		
 		remSpFromContainer( pSp);
+		
+		pSp.destroy();
 		
 		sprites.remove( pSp.name);
 	}
@@ -260,13 +262,13 @@ class GroundMgr {
 		depthMgr = null;
 	}
 	
-	function addSpToContainer( pSp : MySprite, pDHint : Float) : Void {
+	public function addSpToContainer( pSp : MySprite, pDHint : Float) : Void {
 		container.addChild( pSp);
 		
 		if( depthMgr != null) depthMgr.setDepth( pSp, pSp.getSpDHint( this, pDHint));
 	}
 	
-	function remSpFromContainer( pSp : MySprite) : Void {
+	public function remSpFromContainer( pSp : MySprite) : Void {
 		if( depthMgr != null) depthMgr.freeDepth( pSp);
 		
 		container.removeChild( pSp);
@@ -302,8 +304,8 @@ class GroundMgr {
 		return lRes;
 	}
 	
-	function addSpriteCellRegular( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false) : MyCell {
-		var lCell			: MyCell		= _lvlGround.createCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale);
+	function addSpriteCellRegular( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
+		var lCell			: MyCell		= _lvlGround.createCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale, false, pRot);
 		var lCellClipRIJ	: RectangleIJ	= lCell.getCellOffset().clone();
 		var lClipRIJ		: RectangleIJ	= new RectangleIJ( curI, curJ, NB_CELLS_W - 1, NB_CELLS_H - 1);
 		var lI				: Int			= _lvlGround.x2i( pX);
@@ -324,8 +326,8 @@ class GroundMgr {
 		return lCell;
 	}
 	
-	function addSpriteCellCycle( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false) : MyCell {
-		var lCell			: MyCell		= _lvlGround.createCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale);
+	function addSpriteCellCycle( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
+		var lCell			: MyCell		= _lvlGround.createCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale, false, pRot);
 		var lOffsets		: RectangleIJ	= getCellCameraOffsets( lCell);
 		var lGroundOffset	: PointIJ;
 		var lOffset			: PointIJ;

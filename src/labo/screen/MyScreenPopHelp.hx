@@ -2,7 +2,7 @@ package labo.screen;
 
 import pixi.core.display.DisplayObject;
 import pixi.flump.Movie;
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import vega.local.LocalMgr;
 import vega.screen.MyScreen;
 import vega.sound.SndMgr;
@@ -37,7 +37,7 @@ class MyScreenPopHelp extends MyScreen {
 		LocalMgr.instance.recursiveSetLocalTxt( asset);
 	}
 	
-	function onClose( pE : EventTarget) : Void {
+	function onClose( pE : InteractionEvent) : Void {
 		SndMgr.getInstance().play( "click");
 		
 		shell.onScreenClose( this);

@@ -1,6 +1,7 @@
 package vega.sprites;
 
 import pixi.core.display.Container;
+import pixi.core.display.DisplayObject.DestroyOptions;
 import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import pixi.flump.Movie;
@@ -8,6 +9,7 @@ import vega.assets.AssetInstance;
 import vega.assets.AssetsMgr;
 import vega.utils.UtilsFlump;
 import vega.utils.UtilsPixi;
+import haxe.extern.EitherType;
 
 /**
  * ...
@@ -41,7 +43,7 @@ class MySprite extends Container {
 	/**
 	 * destruction d'instance de sprite
 	 */
-	override public function destroy() : Void {
+	override public function destroy( ?options : EitherType<Bool,DestroyOptions>) : Void {
 		freeAssetSp();
 		
 		if ( _desc != null) {
@@ -94,14 +96,16 @@ class MySprite extends Container {
 	function freeAssetSp() : Void {
 		if ( assetSp == null) return;
 		
-		removeChild( assetSp);
+		if ( assetSp.parent != null) assetSp.parent.removeChild( assetSp);
+		
 		assetSp.free();
 		assetSp = null;
 	}
 	
 	/**
 	 * récupère zone de hit dans repère du plan ; méthode utilitaire simpliste par défaut
-	 * @return	rectangle de hit
+	 * @deprecated	utilisé pour les murs / pf, mais suppose des collisions que sur un rectangle, trop limitant, pas générique
+	 * @return		rectangle de hit
 	 */
 	function getHitRect() : Rectangle {
 		var lCont	: Movie	= cast assetSp.getContent();

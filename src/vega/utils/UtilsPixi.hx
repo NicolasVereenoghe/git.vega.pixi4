@@ -3,7 +3,7 @@ import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
 import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import vega.assets.AssetInstance;
 import vega.shell.ApplicationMatchSize;
 import vega.shell.GlobalPointer;
@@ -212,14 +212,14 @@ class UtilsPixi {
 		return pDisp;
 	}
 	
-	public static function setQuickBt( pDisp : DisplayObject, pListener : EventTarget -> Void) : Void {
+	public static function setQuickBt( pDisp : DisplayObject, pListener : InteractionEvent -> Void) : Void {
 		pDisp.buttonMode = true;
 		pDisp.interactive = true;
 		
 		pDisp.addListener( "touchstart", onQuickBtTouch);
 		pDisp.addListener( "mousedown", onQuickBtMouse);
 		
-		if ( quickBtListeners == null) quickBtListeners = new Map<DisplayObject,EventTarget->Void>();
+		if ( quickBtListeners == null) quickBtListeners = new Map<DisplayObject,InteractionEvent->Void>();
 		
 		quickBtListeners.set( pDisp, pListener);
 	}
@@ -233,21 +233,21 @@ class UtilsPixi {
 		quickBtListeners.remove( pDisp);
 	}
 	
-	static var quickBtListeners					: Map<DisplayObject,EventTarget->Void>					= null;
+	static var quickBtListeners					: Map<DisplayObject,InteractionEvent->Void>					= null;
 	
-	static function onQuickBtTouch( pE : EventTarget) : Void {
+	static function onQuickBtTouch( pE : InteractionEvent) : Void {
 		if ( GlobalPointer.isOK()) GlobalPointer.instance.forceCaptureDown( pE, false);
 		
 		callQuickListener( pE);
 	}
 	
-	static function onQuickBtMouse( pE : EventTarget) : Void {
+	static function onQuickBtMouse( pE : InteractionEvent) : Void {
 		if ( GlobalPointer.isOK()) GlobalPointer.instance.forceCaptureDown( pE, true);
 		
 		callQuickListener( pE);
 	}
 	
-	static function callQuickListener( pE : EventTarget) : Void {
+	static function callQuickListener( pE : InteractionEvent) : Void {
 		var lTarget	: DisplayObject	= cast pE.target;
 		var lDisp	: DisplayObject;
 		

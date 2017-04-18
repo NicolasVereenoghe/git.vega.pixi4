@@ -12,10 +12,12 @@ class MyCamera {
 	var _INERT_DIST_X				: Float							= 100;
 	var _MAX_INERTIA_DELT_X			: Float							= 220;
 	var MAX_INERTIA_X				: Float							= 1 / 6;
+	var MIN_INERTIA_X				: Float							= 0;
 	
 	var _INERT_DIST_Y				: Float							= 100;
 	var _MAX_INERTIA_DELT_Y			: Float							= 220;
 	var MAX_INERTIA_Y				: Float							= 1 / 6;
+	var MIN_INERTIA_Y				: Float							= 0;
 	
 	var INERTIA_DELT_I				: Float							= 1 / 26;//1 / 18;
 	
@@ -100,15 +102,15 @@ class MyCamera {
 		
 		if ( lDeltX > getINERT_DIST_X()) {
 			lRate			= Math.min( 1, ( lDeltX - getINERT_DIST_X()) / getMAX_INERTIA_DELT_X());
-			inertiaLeft		= 0;
+			inertiaLeft		= MIN_INERTIA_X;
 			inertiaRight	+= ( lRate * MAX_INERTIA_X - inertiaRight) * INERTIA_DELT_I;
 		}else if ( lDeltX < -getINERT_DIST_X()) {
 			lRate			= Math.min( 1, -( lDeltX + getINERT_DIST_X()) / getMAX_INERTIA_DELT_X());
 			inertiaLeft		+= ( lRate * MAX_INERTIA_X - inertiaLeft) * INERTIA_DELT_I;
-			inertiaRight	= 0;
+			inertiaRight	= MIN_INERTIA_X;
 		}else {
-			inertiaLeft		-= inertiaLeft * INERTIA_DELT_I;
-			inertiaRight	-= inertiaRight * INERTIA_DELT_I;
+			inertiaLeft		-= ( inertiaLeft - MIN_INERTIA_X) * INERTIA_DELT_I;
+			inertiaRight	-= ( inertiaRight - MIN_INERTIA_X) * INERTIA_DELT_I;
 		}
 		
 		lDelt = Math.max( inertiaLeft, inertiaRight) * lDeltX;
@@ -116,15 +118,15 @@ class MyCamera {
 		
 		if ( lDeltY > getINERT_DIST_Y()) {
 			lRate			= Math.min( 1, ( lDeltY - getINERT_DIST_Y()) / getMAX_INERTIA_DELT_Y());
-			inertiaTop		= 0;
+			inertiaTop		= MIN_INERTIA_Y;
 			inertiaBottom	+= ( lRate * MAX_INERTIA_Y - inertiaBottom) * INERTIA_DELT_I;
 		}else if ( lDeltY < -getINERT_DIST_Y()) {
 			lRate			= Math.min( 1, -( lDeltY + getINERT_DIST_Y()) / getMAX_INERTIA_DELT_Y());
 			inertiaTop		+= ( lRate * MAX_INERTIA_Y - inertiaTop) * INERTIA_DELT_I;
-			inertiaBottom	= 0;
+			inertiaBottom	= MIN_INERTIA_Y;
 		}else {
-			inertiaTop		-= inertiaTop * INERTIA_DELT_I;
-			inertiaBottom	-= inertiaBottom * INERTIA_DELT_I;
+			inertiaTop		-= ( inertiaTop - MIN_INERTIA_Y) * INERTIA_DELT_I;
+			inertiaBottom	-= ( inertiaBottom - MIN_INERTIA_Y) * INERTIA_DELT_I;
 		}
 		
 		lDelt = Math.max( inertiaTop, inertiaBottom) * lDeltY;

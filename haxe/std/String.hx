@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2005-2012 Haxe Foundation
+ * Copyright (C)2005-2017 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,13 +22,15 @@
 /**
 	The basic String class.
 
-	A haxe String is immutable, it is not possible to modify individual
+	A Haxe String is immutable, it is not possible to modify individual
 	characters. No method of this class changes the state of `this` String.
 
-	Strings can be constructed using the string literal syntax "string value".
+	Strings can be constructed using the String literal syntax `"string value"`.
 
-	String can be concatenated by using the + operator. If an operand is not a
-	String, it is passed through Std.string() first.
+	String can be concatenated by using the `+` operator. If an operand is not a
+	String, it is passed through `Std.string()` first.
+	
+	@see https://haxe.org/manual/std-String.html
 **/
 extern class String {
 
@@ -59,7 +61,7 @@ extern class String {
 	/**
 		Returns the character at position `index` of `this` String.
 
-		If `index` is negative or exceeds `this.length`, the empty String ""
+		If `index` is negative or exceeds `this.length`, the empty String `""`
 		is returned.
 	**/
 	function charAt(index : Int) : String;
@@ -67,16 +69,16 @@ extern class String {
 	/**
 		Returns the character code at position `index` of `this` String.
 
-		If `index` is negative or exceeds `this.length`, null is returned.
+		If `index` is negative or exceeds `this.length`, `null` is returned.
 
-		To obtain the character code of a single character, "x".code can be used
-		instead to inline the character code at compile time. Note that this
-		only works on String literals of length 1.
+		To obtain the character code of a single character, `"x".code` can be
+		used instead to inline the character code at compile time. Note that
+		this only works on String literals of length 1.
 	**/
 	function charCodeAt( index : Int) : Null<Int>;
 
 	/**
-		Returns the position of the leftmost occurence of `str` within `this`
+		Returns the position of the leftmost occurrence of `str` within `this`
 		String.
 
 		If `startIndex` is given, the search is performed within the substring
@@ -89,7 +91,7 @@ extern class String {
 	function indexOf( str : String, ?startIndex : Int ) : Int;
 
 	/**
-		Returns the position of the rightmost occurence of `str` within `this`
+		Returns the position of the rightmost occurrence of `str` within `this`
 		String.
 
 		If `startIndex` is given, the search is performed within the substring
@@ -102,12 +104,12 @@ extern class String {
 	function lastIndexOf( str : String, ?startIndex : Int ) : Int;
 
 	/**
-		Splits `this` String at each occurence of `delimiter`.
+		Splits `this` String at each occurrence of `delimiter`.
 
-		If `this` String is the empty String "", the result is not consistent
+		If `this` String is the empty String `""`, the result is not consistent
 		across targets and may either be `[]` (on Js, Cpp) or `[""]`.
 
-		If `delimiter` is the empty String "", `this` String is split into an
+		If `delimiter` is the empty String `""`, `this` String is split into an
 		Array of `this.length` elements, where the elements correspond to the
 		characters of `this` String.
 
@@ -116,10 +118,10 @@ extern class String {
 
 		If `delimiter` is null, the result is unspecified.
 
-		Otherwise, `this` String is split into parts at each occurence of
-		`delimiter`. If `this` String starts (or ends) with [delimiter}, the
-		result Array contains a leading (or trailing) empty String "" element.
-		Two subsequent delimiters also result in an empty String "" element.
+		Otherwise, `this` String is split into parts at each occurrence of
+		`delimiter`. If `this` String starts (or ends) with `delimiter`, the
+		result `Array` contains a leading (or trailing) empty String `""` element.
+		Two subsequent delimiters also result in an empty String `""` element.
 	**/
 	function split( delimiter : String ) : Array<String>;
 
@@ -151,7 +153,7 @@ extern class String {
 		`this.length`, `this.length` is used instead.
 
 		If the (possibly swapped) `startIndex` exceeds `this.length`, the empty
-		String "" is returned.
+		String `""` is returned.
 	**/
 	function substring( startIndex : Int, ?endIndex : Int ) : String;
 
@@ -166,5 +168,5 @@ extern class String {
 		If `code` is negative or has another invalid value, the result is
 		unspecified.
 	**/
-	static function fromCharCode( code : Int ) : String;
+	@:pure static function fromCharCode( code : Int ) : String;
 }

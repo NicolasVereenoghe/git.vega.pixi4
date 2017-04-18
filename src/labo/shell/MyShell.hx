@@ -6,7 +6,7 @@ import labo.shell.MyHUD;
 import labo.screen.MyScreenMainInit;
 import pixi.core.display.Container;
 import pixi.core.math.shapes.Rectangle;
-import pixi.interaction.EventTarget;
+import pixi.interaction.InteractionEvent;
 import vega.assets.AssetInstance;
 import vega.assets.AssetsMgr;
 import vega.loader.VegaLoader;
@@ -93,7 +93,7 @@ class MyShell extends GameShell {
 		}
 	}
 	
-	function onBtFullscreen( pE : EventTarget) : Void { SndMgr.getInstance().play( "click", null, true); }
+	function onBtFullscreen( pE : InteractionEvent) : Void { SndMgr.getInstance().play( "click", null, true); }
 	
 	override function setCurScreen( pScreen : MyScreen) : Void {
 		super.setCurScreen( pScreen);

@@ -21,7 +21,9 @@ class FixtureDef {
 	public var filterCategoryBits		: Int;
 	public var filterMaskBits			: Int;
 	
-	public function new( ?userData : Dynamic, ?friction : Float, ?restitution : Float, ?density : Float, ?isSensor : Bool, ?filterGroupIndex : Int, ?filterCategoryBits : Int, ?filterMaskBits : Int) {
+	public var shape					: Shape;
+	
+	public function new( ?userData : Dynamic, ?friction : Float, ?restitution : Float, ?density : Float, ?isSensor : Bool, ?filterGroupIndex : Int, ?filterCategoryBits : Int, ?filterMaskBits : Int, ?shape : Shape) {
 		this.userData				= userData;
 		this.friction				= friction != null ?					friction					: 0.2;
 		this.restitution			= restitution != null ?					restitution					: 0;
@@ -30,6 +32,8 @@ class FixtureDef {
 		this.filterGroupIndex		= filterGroupIndex != null ?			filterGroupIndex			: 0;
 		this.filterCategoryBits		= filterCategoryBits != null ?			filterCategoryBits			: 0x0001;
 		this.filterMaskBits			= filterMaskBits != null ?				filterMaskBits				: 0xFFFF;
+		
+		this.shape					= shape;
 	}
 }
 
@@ -48,7 +52,7 @@ class Filter {
 
 @:native("planck.Fixture")
 extern class Fixture {
-	function new( body : Body, shape : EitherType<Shape,FixtureDef>, def : EitherType<FixtureDef,Float>);
+	function new( body : Body, shape : EitherType<Shape,FixtureDef>, ?def : EitherType<FixtureDef,Float>);
 	
 	function getType() : String;
 	

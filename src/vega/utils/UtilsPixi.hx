@@ -14,6 +14,26 @@ import vega.shell.GlobalPointer;
  */
 class UtilsPixi {
 	/**
+	 * calcul de la boite englobante d'un graphisme dans le repère d'un autre graphisme
+	 * @param	pDisp			graphisme dont on cherche la boite englobante
+	 * @param	pToLocalCont	graphisme servant de repère pour les coord de boite englobante
+	 * @return	boite englobante
+	 */
+	public static function toLocalRect( pDisp : DisplayObject, pToLocalCont : DisplayObject) : Rectangle {
+		var lRect	: Rectangle	= pDisp.getLocalBounds();
+		var lTL		: Point		= pToLocalCont.toLocal( new Point( lRect.x, lRect.y), pDisp);
+		var lBR		: Point		= pToLocalCont.toLocal( new Point( lRect.x + lRect.width, lRect.y + lRect.height), pDisp);
+		
+		lRect.x			= Math.min( lTL.x, lBR.x);
+		lRect.y			= Math.min( lTL.y, lBR.y);
+		
+		lRect.width		= Math.max( lTL.x, lBR.x) - lRect.x;
+		lRect.height	= Math.max( lTL.y, lBR.y) - lRect.y;
+		
+		return lRect;
+	}
+	
+	/**
 	 * remplacement pour le DisplayObject::getLocalBounds qui rate sur le width et height
 	 * /!\ ne prends pas en compte le skew ou rotation
 	 * /!\ hack applicable que sur les Container (pas sur DisplayObject, car width et height non définis)

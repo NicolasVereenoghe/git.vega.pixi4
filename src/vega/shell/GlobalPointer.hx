@@ -110,7 +110,7 @@ class GlobalPointer {
 	 * @param	pIsMouse	true si event venant de souris, sinon recherche d'identifiant sur toutes les touches
 	 * @return	descripteur de touche ou null si pas trouvé
 	 */
-	public function getTouchEvent( pE : InteractionEvent, pIsMouse : Bool) : TouchDesc {
+	public function getTouchEvent( pE : InteractionEvent, pIsMouse : Bool = false) : TouchDesc {
 		if ( pIsMouse) return getMouseTouch();
 		else return getTouchId( pE.data.identifier);
 		// sans InteractionData::identifier

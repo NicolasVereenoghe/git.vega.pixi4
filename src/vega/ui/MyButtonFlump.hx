@@ -25,6 +25,8 @@ class MyButtonFlump {
 	public static inline var NAME_SELECT_DOWN	: String					= "selectDown";
 	/** nom de symbole d'état "selectOver" dans le conteneur */
 	public static inline var NAME_SELECT_OVER	: String					= "selectOver";
+	/** nom de symbole d'état "disable" dans le conteneur */
+	public static inline var NAME_DISABLE		: String					= "disable";
 	
 	var stateUp								: DisplayObject;
 	var stateOver							: DisplayObject;
@@ -33,6 +35,8 @@ class MyButtonFlump {
 	var stateSelect							: DisplayObject;
 	var stateSelectOver						: DisplayObject;
 	var stateSelectDown						: DisplayObject;
+	
+	var stateDisable						: DisplayObject;
 	
 	var curState							: DisplayObject;
 	
@@ -126,6 +130,12 @@ class MyButtonFlump {
 			stateSelectOver = pCont.getLayer( NAME_SELECT_OVER).getChildAt( 0);
 			stateSelectOver.interactive = false;
 			stateSelectOver.visible = false;
+		}
+		
+		if( UtilsFlump.getLayer( NAME_DISABLE, pCont) != null) {
+			stateDisable = pCont.getLayer( NAME_DISABLE).getChildAt( 0);
+			stateDisable.interactive = false;
+			stateDisable.visible = false;
 		}
 		
 		enableState( stateUp);
@@ -224,6 +234,12 @@ class MyButtonFlump {
 	public function switchEnable( pIsEnable : Bool) : Void {
 		hit.buttonMode	= pIsEnable;
 		hit.interactive	= pIsEnable;
+		
+		if ( pIsEnable){
+			if ( stateDisable != null && curState == stateDisable) enableState( stateUp);
+		}else{
+			if ( stateDisable != null) enableState( stateDisable);
+		}
 	}
 	
 	/**

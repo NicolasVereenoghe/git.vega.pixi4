@@ -189,7 +189,7 @@ extern class Body {
 	
 	function shouldCollide( that : Body) : Bool;
 	
-	function createFixture( shape : EitherType<Shape,FixtureDef>, fixdef : EitherType<FixtureDef,Float>) : Fixture;
+	function createFixture( shape : EitherType<Shape,FixtureDef>, ?fixdef : EitherType<FixtureDef,Float>) : Fixture;
 	
 	function destroyFixture( fixture : Fixture) : Void;
 	

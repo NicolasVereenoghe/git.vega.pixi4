@@ -30,6 +30,15 @@ class WorldDef {
 
 @:native("planck.World")
 extern class World {
+	//static var WORLD_REMOVE_BODY			: String					= "remove-body";	// ? Body->Void
+	static inline var WORLD_REMOVE_JOINT	: String					= "remove-joint";	// Joint->Void
+	static inline var WORLD_REMOVE_FIXTURE	: String					= "remove-fixture";	// Fixture->Void
+	
+	static inline var WORLD_CONTACT_BEGIN	: String					= "begin-contact";	// Contact->Void
+	static inline var WORLD_CONTACT_END		: String					= "end-contact";	// Contact->Void
+	static inline var WORLD_CONTACT_PRE		: String					= "pre-solve";		// Contact->Manifold->Void
+	static inline var WORLD_CONTACT_POST	: String					= "post-solve";		// Contact->ContactImpulse->Void
+	
 	function new( def : EitherType<WorldDef,Vec2>);
 	
 	function getBodyList() : Body;
@@ -98,7 +107,7 @@ extern class World {
 	
 	function destroyJoint( joint : Joint) : Void;
 	
-	function step( timeStep : Float, velocityIterations : Int, positionIterations : Int) : Void;
+	function step( timeStep : Float, ?velocityIterations : Int, ?positionIterations : Int) : Void;
 	
 	function findNewContacts() : Void;
 	
@@ -106,7 +115,7 @@ extern class World {
 	
 	function destroyContact( contact : Contact) : Void;
 	
-	function on( name : String, listener : EitherType<Contact->Void,EitherType<Contact->Manifold->Void,Contact->ContactImpulse->Void>>) : World;
+	function on( name : String, listener : EitherType<Body->Void,EitherType<Fixture->Void,EitherType<Joint->Void,EitherType<Contact->Void,EitherType<Contact->Manifold->Void,Contact->ContactImpulse->Void>>>>>) : World;
 	
-	function off( name : String, listener : EitherType<Contact->Void,EitherType<Contact->Manifold->Void,Contact->ContactImpulse->Void>>) : World;
+	function off( name : String, listener : EitherType<Body->Void,EitherType<Fixture->Void,EitherType<Joint->Void,EitherType<Contact->Void,EitherType<Contact->Manifold->Void,Contact->ContactImpulse->Void>>>>>) : World;
 }

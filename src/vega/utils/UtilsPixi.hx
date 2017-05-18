@@ -232,6 +232,17 @@ class UtilsPixi {
 		return pDisp;
 	}
 	
+	public static function fit( pDisp : Container, pRect : Rectangle = null) : Container {
+		if ( pRect == null) pRect = ApplicationMatchSize.instance.getScreenRectExt();
+		
+		pDisp.x			= pRect.x;
+		pDisp.y			= pRect.y;
+		pDisp.width		= pRect.width;
+		pDisp.height	= pRect.height;
+		
+		return pDisp;
+	}
+	
 	public static function setQuickBt( pDisp : DisplayObject, pListener : InteractionEvent -> Void) : Void {
 		pDisp.buttonMode = true;
 		pDisp.interactive = true;

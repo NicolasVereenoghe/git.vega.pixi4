@@ -28,9 +28,8 @@ class MyParticleMgr {
 	
 	public function doFrame( pDt : Float) : Void {
 		var lParts	: Array<MyParticle>	= particles.copy();
-		var lPart	: MyParticle;
 		
-		for ( lPart in lParts) lPart.doFrame( pDt);
+		for ( iPart in lParts) iPart.doFrame( pDt);
 	}
 	
 	public function destroy() : Void {

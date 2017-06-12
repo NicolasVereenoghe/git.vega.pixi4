@@ -14,6 +14,8 @@ class MyCtrJustifiedFlump {
 	public static inline var SIDE_RIGHT		: Int						= 1;
 	public static inline var SIDE_CENTER	: Int						= 0;
 	
+	public var value( default, null)		: Int						= 0;
+	
 	var DIGIT_RADIX							: String					= "digit";
 	
 	var container							: Movie;
@@ -39,6 +41,8 @@ class MyCtrJustifiedFlump {
 	}
 	
 	public function setVal( pVal : Int) : Void {
+		value = pVal;
+		
 		if ( side == SIDE_LEFT) setValLeft( pVal);
 		else if ( side == SIDE_RIGHT) setValRight( pVal);
 		else setValCenter( pVal);

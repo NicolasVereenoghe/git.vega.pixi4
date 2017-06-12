@@ -1,5 +1,6 @@
 package vega.screen;
 import pixi.core.graphics.Graphics;
+import pixi.core.math.shapes.Rectangle;
 import vega.shell.ApplicationMatchSize;
 
 /**
@@ -7,7 +8,10 @@ import vega.shell.ApplicationMatchSize;
  * @author nico
  */
 class MyScreenPreload extends MyScreenLoad {
-	var bar									: Graphics;
+	var BAR_RECT						: Rectangle							= null;
+	var BAR_RGB							: Int								= 0x000000;
+	
+	var bar								: Graphics;
 	
 	public function new() {
 		super();
@@ -39,16 +43,27 @@ class MyScreenPreload extends MyScreenLoad {
 		super.buildContent();
 		
 		bar = cast content.addChild( new Graphics());
-		bar.beginFill( 0);
-		bar.drawRect( 0, 0, ApplicationMatchSize.instance.getScreenRectExt().width, 30);
+		
+		bar.beginFill( BAR_RGB);
+		
+		if ( BAR_RECT != null){
+			bar.drawRect( 0, 0, BAR_RECT.width, BAR_RECT.height);
+			bar.x	= BAR_RECT.x;
+			bar.y	= BAR_RECT.y;
+		}else{
+			bar.drawRect( 0, 0, ApplicationMatchSize.instance.getScreenRectExt().width, 30);
+		}
+		
 		bar.endFill();
 		
 		onResize();
 	}
 	
 	override function onResize() : Void {
-		bar.x	= ApplicationMatchSize.instance.getScreenRect().x;
-		bar.y	= ApplicationMatchSize.instance.getScreenRect().y;
+		if( BAR_RECT == null){
+			bar.x	= ApplicationMatchSize.instance.getScreenRect().x;
+			bar.y	= ApplicationMatchSize.instance.getScreenRect().y;
+		}
 		
 		refreshBar();
 	}

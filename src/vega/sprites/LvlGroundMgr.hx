@@ -275,7 +275,7 @@ class LvlGroundMgr {
 	}
 	
 	function y2ModY( pY : Float) : Float {
-		if ( _IS_CYCLE_GROUND) return ( ( pY % ( GROUND_H)) + GROUND_H) % GROUND_H;
+		if ( _IS_CYCLE_GROUND) return ( ( ( pY % GROUND_H) + GROUND_H) % GROUND_H);
 		else return pY;
 	}
 }

@@ -361,9 +361,11 @@ class MyButtonFlump {
 	}
 	
 	function onTUp( pE : InteractionEvent) : Void {
+		var lWasDown	: Bool	= isDown;
+		
 		onTUpOut( pE);
 		
-		if ( onReleaseCB != null) onReleaseCB( pE);
+		if ( lWasDown && onReleaseCB != null) onReleaseCB( pE);
 	}
 	
 	function onTUpOut( pE : InteractionEvent) : Void {
@@ -374,6 +376,8 @@ class MyButtonFlump {
 	}
 	
 	function onUp( pE : InteractionEvent) : Void {
+		var lWasDown	: Bool	= isDown;
+		
 		isDown = false;
 		
 		if ( isSelect()) {
@@ -384,8 +388,10 @@ class MyButtonFlump {
 			else enableState( stateUp);
 		}
 		
-		if ( onReleaseCB != null) onReleaseCB( pE);
-		callListeners( onPressCB, pE);
+		if( lWasDown){
+			if ( onReleaseCB != null) onReleaseCB( pE);
+			callListeners( onPressCB, pE);
+		}
 	}
 	
 	function onTDown( pE : InteractionEvent) : Void { onDown( pE, false); }

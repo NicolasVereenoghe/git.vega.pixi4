@@ -82,6 +82,8 @@ class GroundMgr {
 		spMgr		= null;
 	}
 	
+	public function getCellsAt( pModI : Int, pModJ : Int, pType : Class<MySprite> = null) : Map<String,MyCell> { return _lvlGround.getCellsAt( pModI, pModJ, pType); }
+	
 	public function getLvlGround() : LvlGroundMgr { return _lvlGround; }
 	
 	public function getSprites() : Map<String,MySprite> { return sprites; }
@@ -364,7 +366,7 @@ class GroundMgr {
 	function remSpriteCellRegular( pDesc : MyCell) : Void {
 		if ( sprites.exists( pDesc.getInstanceId())) spMgr.remSpriteDisplay( sprites[ pDesc.getInstanceId()]);
 		
-		_lvlGround.remCell( pDesc);
+		pDesc.getLvlGroundMgr().remCell( pDesc);
 	}
 	
 	function remSpriteCellCycle( pDesc : MyCell) : Void {
@@ -609,5 +611,5 @@ class GroundMgr {
 		else return new RectangleIJ( lLeft, lTop, lRight - lLeft, lBot - lTop);
 	}
 	
-	function getInstanceQualifiedGroundName( pCell : MyCell, pGroundOffset : PointIJ) : String { return "_" + pGroundOffset.i + "_" + pGroundOffset.j + pCell.getInstanceId(); }
+	function getInstanceQualifiedGroundName( pCell : MyCell, pGroundOffset : PointIJ) : String { return "_" + pGroundOffset.i + "_" + pGroundOffset.j + "_" + pCell.getInstanceId(); }
 }

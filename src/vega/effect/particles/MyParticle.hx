@@ -37,11 +37,13 @@ class MyParticle {
 	
 	function addSpriteToContainer() : Void { mgr.container.addChild( _sprite); }
 	
+	function remSpriteFromContainer() : Void { if ( _sprite.parent != null) _sprite.parent.removeChild( _sprite); }
+	
 	function instanciateTextureSprite( pId : String) : Sprite { return null; }
 	
 	function freeTextureSprite() : Void {
 		if ( _sprite != null){
-			if ( _sprite.parent != null) _sprite.parent.removeChild( _sprite);
+			remSpriteFromContainer();
 			
 			_sprite.destroy();
 			_sprite = null;

@@ -45,34 +45,38 @@ class MyScreenMain extends MyScreen {
 	}
 	
 	override function buildContent() : Void {
-		var lStart	: DisplayObject;
-		
 		super.buildContent();
 		
 		if ( asset != null){
-			if( UtilsFlump.getLayer( "hit", cast asset.getContent()) != null){
+			hit = getLayerHit();
+			
+			if( hit != null){
 				hit = cast( asset.getContent(), Movie).getLayer( "hit");
 				hit.alpha = 0;
 				
 				UtilsPixi.setQuickBt( hit, onBtStart);
 			}
 			
-			if ( UtilsFlump.getLayer( "start", cast asset.getContent()) != null){
-				lStart = cast( asset.getContent(), Movie).getLayer( "start");
-				
-				if ( Std.is( cast( lStart, Container).getChildAt( 0), Movie) && UtilsFlump.getLayer( "up", cast cast( lStart, Container).getChildAt( 0)) != null){
-					startBtFlump = new MyButtonFlump( cast cast( lStart, Container).getChildAt( 0));
-					startBtFlump.addPressListener( onBtStart);
-				}else{
-					startBt = lStart;
-					
-					UtilsPixi.setQuickBt( startBt, onBtStart);
-				}
-				
-				if ( hit != null) hit.buttonMode = false;
-			}
+			buildContentStart();
 			
 			LocalMgr.instance.recursiveSetLocalTxt( cast asset.getContent());
+		}
+	}
+	
+	function buildContentStart() : Void {
+		var lStart	: DisplayObject = getLayerStart();
+		
+		if ( lStart != null){
+			if ( Std.is( cast( lStart, Container).getChildAt( 0), Movie) && UtilsFlump.getLayer( MyButtonFlump.NAME_UP, cast cast( lStart, Container).getChildAt( 0)) != null){
+				startBtFlump = new MyButtonFlump( cast cast( lStart, Container).getChildAt( 0));
+				startBtFlump.addPressListener( onBtStart);
+			}else{
+				startBt = lStart;
+				
+				UtilsPixi.setQuickBt( startBt, onBtStart);
+			}
+			
+			if ( hit != null) hit.buttonMode = false;
 		}
 	}
 	
@@ -85,4 +89,7 @@ class MyScreenMain extends MyScreen {
 		
 		//pE.stopPropagation();
 	}
+	
+	function getLayerHit() : Container { return UtilsFlump.getLayer( "hit", cast asset.getContent()); }
+	function getLayerStart() : Container { return UtilsFlump.getLayer( "start", cast asset.getContent()); }
 }

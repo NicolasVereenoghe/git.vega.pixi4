@@ -111,6 +111,10 @@ class MyScreen {
 			bg.endFill();
 		}
 		
+		buildContentAsset();
+	}
+	
+	function buildContentAsset() : Void {
 		if ( ASSET_ID != null){
 			asset = cast content.addChild( AssetsMgr.instance.getAssetInstance( ASSET_ID));
 		}

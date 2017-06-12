@@ -95,7 +95,7 @@ class MySpriteMgr {
 		var lIMod	: Int					= lLvlG.x2ModI( pX);
 		var lJMod	: Int					= lLvlG.y2ModJ( pY);
 		var lIJ		: PointIJ				= new PointIJ( lLvlG.x2i( pX), lLvlG.y2j( pY));
-		var lCells	: Map<String,MyCell>	= lLvlG.getCellsAt( lIMod, lJMod);
+		var lCells	: Map<String,MyCell>	= lGround.getCellsAt( lIMod, lJMod);
 		var lSps	: Array<MySprite>		= [];
 		var lCell	: MyCell;
 		
@@ -121,15 +121,15 @@ class MySpriteMgr {
 	 * @return	la cellule de sprite créée
 	 */
 	public function addSpriteCell( pGroundId : String, pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
-		return grounds[ pGroundId].addSpriteCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale, pForceDisplay, pRot);
+		return getGround( pGroundId).addSpriteCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale, pForceDisplay, pRot);
 	}
 	
 	public function remSpriteCell( pDesc : MyCell) : Void {
-		grounds[ pDesc.getLvlGroundMgr().getId()].remSpriteCell( pDesc);
+		getGround( pDesc.getLvlGroundMgr().getId()).remSpriteCell( pDesc);
 	}
 	
 	public function getSpriteCell( pDesc : MyCell, pIJ : PointIJ = null) : Array<MySprite> {
-		return grounds[ pDesc.getLvlGroundMgr().getId()].getSpriteCell( pDesc, pIJ);
+		return getGround( pDesc.getLvlGroundMgr().getId()).getSpriteCell( pDesc, pIJ);
 	}
 	
 	/**
@@ -138,7 +138,7 @@ class MySpriteMgr {
 	 * @return	true si dans l'affichage, false sinon
 	 */
 	public function isCellInClip( pCell : MyCell) : Bool {
-		return grounds[ pCell.getLvlGroundMgr().getId()].isCellInClip( pCell);
+		return getGround( pCell.getLvlGroundMgr().getId()).isCellInClip( pCell);
 	}
 	
 	/**
@@ -155,7 +155,7 @@ class MySpriteMgr {
 	
 	public function addSpriteDisplay( pSp : MySprite, pX : Float, pY : Float, pID : String = null, pDesc : MyCell = null) : Void {
 		if ( pDesc != null && pDesc.getLvlGroundMgr() != null) {
-			grounds[ pDesc.getLvlGroundMgr().getId()].addSpriteDisplay( pSp, pX, pY, pID, pDesc);
+			getGround( pDesc.getLvlGroundMgr().getId()).addSpriteDisplay( pSp, pX, pY, pID, pDesc);
 		}
 		
 		sprites.push( pSp);
@@ -165,7 +165,7 @@ class MySpriteMgr {
 		sprites.remove( pSp);
 		
 		if ( pSp.getDesc() != null && pSp.getDesc().getLvlGroundMgr() != null) {
-			grounds[ pSp.getDesc().getLvlGroundMgr().getId()].remSpriteDisplay( pSp);
+			getGround( pSp.getDesc().getLvlGroundMgr().getId()).remSpriteDisplay( pSp);
 		}
 	}
 	
@@ -236,7 +236,7 @@ class MySpriteMgr {
 		if ( LvlMgr.getInstance().exists( _lvlId)){
 			lLvlGround = LvlMgr.getInstance().getLvlGroundMgr( 0, _lvlId);
 			while ( lLvlGround != null) {
-				grounds[ lLvlGround.getId()] = addGround( lI, lLvlGround);
+				addGround( lI, lLvlGround);
 				
 				lLvlGround = LvlMgr.getInstance().getLvlGroundMgr( ++lI, _lvlId);
 			}
@@ -246,15 +246,12 @@ class MySpriteMgr {
 	/**
 	 * on instancie un gestionnaire de plan d'affichage, et ajoute au conteneur d'affichage (::container) le conteneur de ce plan
 	 * appelé par ordre de profondeur des plans qui constituent ce gestionnaire de sprites (de derrière à devant)
+	 * on effectue aussi l'enregistrement de ce ground dans la collection de grounds ( ::grounds)
 	 * @param	pI			indice de profondeur du plan d'affichage ( 0 .. n-1)
 	 * @param	pLvlGround	gestionnaire de matrice de données du plan d'affichage
 	 * @return	instance de plan d'affichage créée
 	 */
-	function addGround( pI : Int, pLvlGround : LvlGroundMgr) : GroundMgr {
-		var lCont	: Container	= cast container.addChild( new Container());
-		
-		return new GroundMgr( lCont, pLvlGround, this);
-	}
+	function addGround( pI : Int, pLvlGround : LvlGroundMgr) : GroundMgr { return grounds[ pLvlGround.getId()] = new GroundMgr( cast container.addChild( new Container()), pLvlGround, this); }
 	
 	function freeContainers() : Void { }
 	

@@ -255,9 +255,9 @@ class AssetDesc {
 			}
 		}else if ( lRender.render == AssetRender.RENDER_FLUMP){
 			if ( lRender.type == AssetRender.TYPE_FLUMP_MC){
-				return new AssetInstance( this, new Movie( export));
+				return new AssetInstance( this, new Movie( export, getFile().getId()));
 			}else if ( lRender.type == AssetRender.TYPE_FLUMP_SP){
-				return new AssetInstance( this, new pixi.flump.Sprite( export));
+				return new AssetInstance( this, new pixi.flump.Sprite( export, getFile().getId()));
 			}
 		}
 		

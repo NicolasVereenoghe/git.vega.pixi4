@@ -127,15 +127,16 @@ class UtilsFlump {
 	 * @param	pMovie		instance de movie dont on cherche à virer un clone de layer
 	 * @param	pLayer		nom complet de layer dont on veut virer le clone
 	 * @param	pCloneAffix	affix de clone pour pouvoir distinguer plusieurs instance de clones ; laisser null pour ne gérer qu'un seul clone
+	 * @param	pClone		on peut directement désigner l'instance de clone
 	 */
-	public static function unsetCloneLayer( pMovie : Movie, pLayer : String, pCloneAffix : String = null) : Void {
+	public static function unsetCloneLayer( pMovie : Movie, pLayer : String, pCloneAffix : String = null, pClone : Container = null) : Void {
 		var lName	: String			= pLayer + LAYER_CLONE_AFFIX;
 		var lClone	: Container;
 		var lCont	: DisplayObject;
 		
 		if ( pCloneAffix != null) lName += pCloneAffix;
 		
-		lClone	= cast pMovie.getChildByName( lName);
+		lClone	= ( pClone != null ? pClone : cast pMovie.getChildByName( lName));
 		lCont	= lClone.getChildAt( 0);
 		
 		if ( Std.is( lClone, AssetInstance)){
@@ -161,9 +162,10 @@ class UtilsFlump {
 	 * @param	pMovie	instance de movie dont on cherche à virer tous les clone de layer
 	 */
 	public static function unsetCloneLayers( pMovie : Movie) : Void {
-		var lChild	: DisplayObject;
+		var lChildren	: Array<DisplayObject>	= pMovie.children.copy();
+		var lChild		: DisplayObject;
 		
-		for ( lChild in pMovie.children){
+		for ( lChild in lChildren){
 			if ( lChild.name.indexOf( LAYER_CLONE_AFFIX) != -1){
 				if( lChild.name.indexOf( LAYER_CLONE_AFFIX) + LAYER_CLONE_AFFIX.length < lChild.name.length){
 					unsetCloneLayer(

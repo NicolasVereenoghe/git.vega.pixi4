@@ -31,7 +31,7 @@ class ApplicationMatchSize extends Application {
 	/** liste de motifs à afficher si trouvés dans chaine de trace debug, malgré le level de debug */
 	public var debugMotifs						: Array<String>	= null;
 	/** taille de font de trace debug */
-	public var debugFontSize					: Int			= 25;
+	public var debugFontSize					: Int			= 12;// 25;
 	
 	public var version							: String;
 	

@@ -76,6 +76,9 @@ class OneButtonPaddle {
 	 * @param	pE	event de keys down
 	 */
 	function onKeyDown( pE : KeyboardEvent) : Void {
+		// ignore F1 .. F12 ; alt ; tab
+		if ( ( pE.keyCode >= 112 && pE.keyCode <= 123) || pE.keyCode == 18 || pE.keyCode == 9) return;
+		
 		actives[ pE.keyCode] = true;
 		
 		if ( pE.keyCode == 37 || pE.keyCode == 38 || pE.keyCode == 39 || pE.keyCode == 40 || pE.keyCode == 32) pE.preventDefault();

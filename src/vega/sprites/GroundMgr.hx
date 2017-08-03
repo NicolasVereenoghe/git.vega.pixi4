@@ -15,7 +15,7 @@ class GroundMgr {
 	var NB_CELLS_W									: Int												= -1;
 	var NB_CELLS_H									: Int												= -1;
 	
-	var COEF_P										: Float;
+	var COEF_P										: Point;
 	
 	var container									: Container;
 	
@@ -61,7 +61,7 @@ class GroundMgr {
 		
 		buildContainer( pContainer);
 		
-		COEF_P		= _lvlGround.getCOEF_PARALLAXE() - 1;
+		COEF_P		= new Point( _lvlGround.getCOEF_PARALLAXE().x - 1, _lvlGround.getCOEF_PARALLAXE().y - 1);
 		
 		sprites		= new Map<String,MySprite>();
 		
@@ -80,6 +80,8 @@ class GroundMgr {
 		
 		_lvlGround	= null;
 		spMgr		= null;
+		
+		COEF_P		= null;
 	}
 	
 	public function getCellsAt( pModI : Int, pModJ : Int, pType : Class<MySprite> = null) : Map<String,MyCell> { return _lvlGround.getCellsAt( pModI, pModJ, pType); }
@@ -112,8 +114,8 @@ class GroundMgr {
 	
 	public function setInitView() : Void {
 		var lClipR			: Rectangle	= spMgr.getCamera().getClipRect().clone();
-		var lDX				: Float		= -spMgr.getCamera().getScreenMidX() * COEF_P;
-		var lDY				: Float		= -spMgr.getCamera().getScreenMidY() * COEF_P;
+		var lDX				: Float		= -spMgr.getCamera().getScreenMidX() * COEF_P.x;
+		var lDY				: Float		= -spMgr.getCamera().getScreenMidY() * COEF_P.y;
 		var lI				: Int;
 		var lJ				: Int;
 		
@@ -136,8 +138,8 @@ class GroundMgr {
 	 */
 	public function isCellInClip( pCell : MyCell) : Bool {
 		var lClipR			: Rectangle		= spMgr.getCamera().getClipRect().clone();
-		var lDX				: Float			= -spMgr.getCamera().getScreenMidX() * COEF_P;
-		var lDY				: Float			= -spMgr.getCamera().getScreenMidY() * COEF_P;
+		var lDX				: Float			= -spMgr.getCamera().getScreenMidX() * COEF_P.x;
+		var lDY				: Float			= -spMgr.getCamera().getScreenMidY() * COEF_P.y;
 		var lINew			: Int			= _lvlGround.x2i( lClipR.x - lDX);
 		var lJNew			: Int			= _lvlGround.y2j( lClipR.y - lDY);
 		var lClipRIJ		: RectangleIJ	= new RectangleIJ( lINew, lJNew, NB_CELLS_W - 1, NB_CELLS_H - 1);
@@ -184,8 +186,8 @@ class GroundMgr {
 	 */
 	public function slideToCamera() : Void {
 		var lClipR			: Rectangle		= spMgr.getCamera().getClipRect().clone();
-		var lDX				: Float			= -spMgr.getCamera().getScreenMidX() * COEF_P;
-		var lDY				: Float			= -spMgr.getCamera().getScreenMidY() * COEF_P;
+		var lDX				: Float			= -spMgr.getCamera().getScreenMidX() * COEF_P.x;
+		var lDY				: Float			= -spMgr.getCamera().getScreenMidY() * COEF_P.y;
 		var lOldNbCellsW	: Int			= NB_CELLS_W;
 		var lOldNbCellsH	: Int			= NB_CELLS_H;
 		var lClipRIJ		: RectangleIJ;

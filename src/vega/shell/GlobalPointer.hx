@@ -1,4 +1,5 @@
 package vega.shell;
+import js.Error;
 import pixi.core.display.DisplayObject;
 import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
@@ -19,6 +20,9 @@ class GlobalPointer {
 	//var TIMEOUT_MOUSE						: Float						= 5000;
 	/** id arbitraire de touche sans id ; semble correspondre à la souris */
 	public static inline var DEFAULT_ID		: Int						= 421;
+	
+	/** disptance max de proximité pour détecter le bug doublon d'event d'interaction touch/mouse (mousemove déclenché par erreur par navigateur) */
+	var MOUSE_DUP_PROXIMITY					: Float						= 10;
 	
 	/** flag indiquant que le pointeur actuel est de type "touchpad" (true) ou souris (false) */
 	public var isTouchpad					: Bool						= false;
@@ -113,10 +117,6 @@ class GlobalPointer {
 	public function getTouchEvent( pE : InteractionEvent, pIsMouse : Bool = false) : TouchDesc {
 		if ( pIsMouse) return getMouseTouch();
 		else return getTouchId( pE.data.identifier);
-		// sans InteractionData::identifier
-		/*if ( pIsMouse == null) return findNearestPos( pE.data.getLocalPosition( getRepere()), true);
-		else if ( pIsMouse) return getMouseTouch();
-		else return findNearestPos( pE.data.getLocalPosition( getRepere()));*/
 	}
 	
 	/**
@@ -148,6 +148,8 @@ class GlobalPointer {
 	 * @param	pIsMouse	true pour désigner un event de souris, false pour le touchpad
 	 */
 	public function forceCaptureDown( pE : InteractionEvent, pIsMouse : Bool) : Void {
+		ApplicationMatchSize.instance.traceDebug( "WARNING : GlobalPointer::forceCaptureDown : id=" + pE.data.identifier + " ; isMouse=" + pIsMouse);
+		
 		if ( pIsMouse) onMouseDown( pE);
 		else onTouchDown( pE);
 		
@@ -190,9 +192,8 @@ class GlobalPointer {
 	 */
 	public function toString() : String {
 		var lStr	: String		= "";
-		var lTouch	: TouchDesc;
 		
-		for ( lTouch in datas) lStr += lTouch.id + ":" + Math.round( lTouch.coord.x) + ":" + Math.round( lTouch.coord.y) + ":" + ( lTouch.isDown ? "D" : "U") + ":" + ( lTouch.isMouse ? "M" : "T") + " - ";
+		for ( iTouch in datas) lStr += iTouch.id + ":" + Math.round( iTouch.coord.x) + ":" + Math.round( iTouch.coord.y) + ":" + ( iTouch.isDown ? "D" : "U") + ":" + ( iTouch.isMouse ? "M" : "T") + " - ";
 		
 		return lStr;
 	}
@@ -204,89 +205,112 @@ class GlobalPointer {
 	public function getRepere() : DisplayObject { return ApplicationMatchSize.instance.getContent(); }
 	
 	function onTouchDown( pE : InteractionEvent) : Void {
-		datas.push( new TouchDesc( pE.data.getLocalPosition( getRepere()), false, true, pE.data.identifier));
+		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
+		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
 		
-		//ApplicationMatchSize.instance.traceDebug( "INFO : GlobalPointer::onTouchDown : " + datas[ datas.length - 1].id, true);
-		//ApplicationMatchSize.instance.traceDebug( toString(), true);
+		if ( lTouch != null){
+			lTouch.coord	= lPt;
+			lTouch.delay	= 0;
+			lTouch.isDown	= true;
+		}else datas.push( new TouchDesc( lPt, false, true, pE.data.identifier));
 		
 		checkTouchState();
 	}
 	
 	function onTouchUp( pE : InteractionEvent) : Void {
-		// sans InteractionData::identifier
-		//var lTouch	: TouchDesc	= findNearestPos( pE.data.getLocalPosition( getRepere()));
 		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
 		
 		if ( lTouch != null){
 			datas.remove( lTouch);
 			checkTouchState();
 		}
-		
-		//ApplicationMatchSize.instance.traceDebug( toString(), true);
 	}
 	
 	function onTouchMove( pE : InteractionEvent) : Void {
 		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
-		// sans InteractionData::identifier
-		//var lTouch	: TouchDesc	= findNearestPos( lPt);
 		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
 		
 		if ( lTouch != null){
 			lTouch.coord	= lPt;
 			lTouch.delay	= 0;
-		}else{
-			datas.push( new TouchDesc( lPt, false, true, pE.data.identifier));
-			
-			checkTouchState();
-		}
+			lTouch.isDown	= true;
+		}else datas.push( new TouchDesc( lPt, false, true, pE.data.identifier));
+		
+		checkTouchState();
 	}
 	
 	function onMouseDown( pE : InteractionEvent) : Void {
-		var lTouch	: TouchDesc	= getMouseTouch();
+		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
 		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
 		
-		if ( lTouch == null) datas.push( new TouchDesc( lPt, true, true, pE.data.identifier));
-		else {
+		if ( lTouch != null){
 			lTouch.coord	= lPt;
 			lTouch.delay	= 0;
 			lTouch.isDown	= true;
+			
+			if( ! lTouch.isMouse) ApplicationMatchSize.instance.traceDebug( "WARNING : GlobalPointer::onMouseDown : not a mouse event : " + pE.data.identifier);
+		}else{
+			lTouch = findNearestPos( lPt);
+			
+			if ( lTouch != null && ( lTouch.coord.x - lPt.x) * ( lTouch.coord.x - lPt.x) + ( lTouch.coord.y - lPt.y) * ( lTouch.coord.y - lPt.y) <= MOUSE_DUP_PROXIMITY * MOUSE_DUP_PROXIMITY){
+				ApplicationMatchSize.instance.traceDebug( "WARNING : GlobalPointer::onMouseDown : force mouse to touch : " + pE.data.identifier + " -> " + lTouch.id);
+				
+				lTouch.coord	= lPt;
+				lTouch.delay	= 0;
+				lTouch.isDown	= true;
+			}else{
+				datas.push( new TouchDesc( lPt, true, true, pE.data.identifier));
+			}
 		}
-		
-		//ApplicationMatchSize.instance.traceDebug( "INFO : GlobalPointer::onMouseDown : " + lTouch.id, true);
-		//ApplicationMatchSize.instance.traceDebug( pE.data.identifier + " : d : " + toString(), true);
 		
 		checkTouchState();
 	}
 	
 	function onMouseUp( pE : InteractionEvent) : Void {
 		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
-		var lTouch	: TouchDesc	= getMouseTouch();
+		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
 		
 		if ( lTouch != null){
 			lTouch.coord	= lPt;
 			lTouch.delay	= 0;
 			lTouch.isDown	= false;
 		}else{
-			datas.push( new TouchDesc( lPt, true, false, pE.data.identifier));
+			lTouch = findNearestPos( lPt);
+			
+			if ( lTouch != null && ( lTouch.coord.x - lPt.x) * ( lTouch.coord.x - lPt.x) + ( lTouch.coord.y - lPt.y) * ( lTouch.coord.y - lPt.y) <= MOUSE_DUP_PROXIMITY * MOUSE_DUP_PROXIMITY){
+				ApplicationMatchSize.instance.traceDebug( "WARNING : GlobalPointer::onMouseUp : force mouse to touch : " + pE.data.identifier + " -> " + lTouch.id + " ; remove");
+				
+				datas.remove( lTouch);
+			}else{
+				datas.push( new TouchDesc( lPt, true, false, pE.data.identifier));
+			}
 		}
-		
-		//ApplicationMatchSize.instance.traceDebug( "INFO : GlobalPointer::onMouseUp", true);
-		//ApplicationMatchSize.instance.traceDebug( pE.data.identifier + " : u : " + toString(), true);
 		
 		checkTouchState();
 	}
 	
 	function onMouseMove( pE : InteractionEvent) : Void {
 		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
-		var lTouch	: TouchDesc	= getMouseTouch();
+		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
 		
 		if ( lTouch != null){
 			lTouch.coord	= lPt;
 			lTouch.delay	= 0;
-		}else{
-			datas.push( new TouchDesc( lPt, true, false, pE.data.identifier));
 			
-			checkTouchState();
+			if( ! lTouch.isMouse) ApplicationMatchSize.instance.traceDebug( "WARNING : GlobalPointer::onMouseMove : not a mouse event : " + pE.data.identifier);
+		}else{
+			lTouch = findNearestPos( lPt);
+			
+			if ( lTouch != null && ( lTouch.coord.x - lPt.x) * ( lTouch.coord.x - lPt.x) + ( lTouch.coord.y - lPt.y) * ( lTouch.coord.y - lPt.y) <= MOUSE_DUP_PROXIMITY * MOUSE_DUP_PROXIMITY){
+				ApplicationMatchSize.instance.traceDebug( "WARNING : GlobalPointer::onMouseMove : force mouse to touch : " + pE.data.identifier + " -> " + lTouch.id);
+				
+				lTouch.coord	= lPt;
+				lTouch.delay	= 0;
+			}else{
+				datas.push( new TouchDesc( lPt, true, false, pE.data.identifier));
+				
+				checkTouchState();
+			}
 		}
 	}
 	
@@ -303,7 +327,7 @@ class GlobalPointer {
 	 * @param	pDoMouse	true pour inclure la souris à la recherche, false si que le touch pad
 	 * @return	touche enregistrée la plus proche, ou null si rien de trouvé
 	 */
-	/*function findNearestPos( pPos : Point, pDoMouse : Bool = false) : TouchDesc {
+	function findNearestPos( pPos : Point, pDoMouse : Bool = false) : TouchDesc {
 		var lDist	: Float		= -1;
 		var lRes	: TouchDesc	= null;
 		var lTmp	: Float;
@@ -321,7 +345,7 @@ class GlobalPointer {
 		}
 		
 		return lRes;
-	}*/
+	}
 	
 	/**
 	 * on récupère la ref sur la touche de la souris
@@ -349,6 +373,8 @@ class GlobalPointer {
 				isTouchpad	= true;
 				isDown		= true;
 			}
+			
+			//if( isDown) ApplicationMatchSize.instance.traceDebug( toString(), true);
 		}else isDown = false;
 	}
 }
@@ -357,8 +383,6 @@ class GlobalPointer {
  * descripteur de touche
  */
 class TouchDesc {
-	//static var ctrTouch			: Int				= 0;
-	
 	public var coord			: Point;
 	public var delay			: Float;
 	public var isMouse			: Bool;
@@ -368,11 +392,20 @@ class TouchDesc {
 	public var isBound			: Bool				= false;
 	
 	public function new( pCoord : Point, pIsMouse : Bool, pIsDown : Bool, pId : Int) {
+		/*if( pIsMouse){
+			ApplicationMatchSize.instance.traceDebug( "INFO : TouchDesc::TouchDesc : isMouse=" + pIsMouse + " ; isDown=" + pIsDown + " ; id=" + pId, true);
+			
+			try{ throw new Error(); }catch ( pE : Error){
+				ApplicationMatchSize.instance.traceDebug( pE.stack.split( "at ")[ 2], true);
+				ApplicationMatchSize.instance.traceDebug( pE.stack.split( "at ")[ 3], true);
+				ApplicationMatchSize.instance.traceDebug( pE.stack.split( "at ")[ 4], true);
+			}
+		}*/
+		
 		coord	= pCoord;
 		isMouse	= pIsMouse;
 		delay	= 0;
 		isDown	= pIsDown;
-		//id		= ctrTouch++;
 		id		= pId != null ? pId : GlobalPointer.DEFAULT_ID;
 	}
 }

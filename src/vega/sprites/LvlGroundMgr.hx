@@ -16,7 +16,7 @@ class LvlGroundMgr {
 	var _CELLS_PER_W				: Int									= -1;
 	var _CELLS_PER_H				: Int									= -1;
 	
-	var _COEF_PARALLAXE				: Float									= 1;
+	var _COEF_PARALLAXE				: Point									= null;
 	
 	/** pile de clones de cellule de la map en cours (TODO) */
 	var restoreCells				: Array<MyCell>;
@@ -38,11 +38,12 @@ class LvlGroundMgr {
 	var _IS_CYCLE_GROUND			: Bool									= false;
 	var _IS_DEPTH_GROUND			: Bool									= true;
 	
-	public function new( pId : String, pLvlId : String, pCoefPara : Float = 1, pCycleCadre : Rectangle = null, pIsDepthG : Bool = true, pForceRegularSize : Float = -1) {
+	public function new( pId : String, pLvlId : String, pCoefPara : Point = null, pCycleCadre : Rectangle = null, pIsDepthG : Bool = true, pClipping : Point = null) {
 		cells 			= new Map<Int,Map<Int,Map<String,MyCell>>>();
 		restoreCells	= new Array<MyCell>();
 		
-		_COEF_PARALLAXE	= pCoefPara;
+		if ( pCoefPara != null) _COEF_PARALLAXE = pCoefPara;
+		else _COEF_PARALLAXE = new Point( 1, 1);
 		
 		_IS_DEPTH_GROUND = pIsDepthG;
 		
@@ -52,15 +53,22 @@ class LvlGroundMgr {
 			GROUND_W			= pCycleCadre.width;
 			GROUND_H			= pCycleCadre.height;
 			
-			_CELLS_PER_W		= Math.floor( GROUND_W / Math.max( CELL_MAX_SIZE * _COEF_PARALLAXE, CELL_MIN_SIZE));
-			_CELLS_PER_H		= Math.floor( GROUND_H / Math.max( CELL_MAX_SIZE * _COEF_PARALLAXE, CELL_MIN_SIZE));
+			_CELLS_PER_W		= Utils.maxInt( Math.floor( GROUND_W / Math.max( CELL_MAX_SIZE * _COEF_PARALLAXE.x, CELL_MIN_SIZE)), 1);
+			_CELLS_PER_H		= Utils.maxInt( Math.floor( GROUND_H / Math.max( CELL_MAX_SIZE * _COEF_PARALLAXE.y, CELL_MIN_SIZE)), 1);
 			
 			_CELL_W				= GROUND_W / _CELLS_PER_W;
 			_CELL_H				= GROUND_H / _CELLS_PER_H;
 		}else{
 			GROUND_W			= GROUND_H = Math.POSITIVE_INFINITY;
 			_CELLS_PER_W		= _CELLS_PER_H = Utils.INT_MAX;
-			_CELL_W				= _CELL_H = pForceRegularSize > 0 ? pForceRegularSize : Math.max( CELL_MAX_SIZE * _COEF_PARALLAXE, CELL_MIN_SIZE);
+			
+			if ( pClipping != null){
+				_CELL_W = pClipping.x;
+				_CELL_H = pClipping.y;
+			}else{
+				_CELL_W = Math.max( CELL_MAX_SIZE * _COEF_PARALLAXE.x, CELL_MIN_SIZE);
+				_CELL_H = Math.max( CELL_MAX_SIZE * _COEF_PARALLAXE.y, CELL_MIN_SIZE);
+			}
 		}
 		
 		_id				= pId;
@@ -242,7 +250,7 @@ class LvlGroundMgr {
 	public function getCELL_H() : Float { return _CELL_H; }
 	public function getCELLS_PER_W() : Int { return _CELLS_PER_W; }
 	public function getCELLS_PER_H() : Int { return _CELLS_PER_H; }
-	public function getCOEF_PARALLAXE() : Float { return _COEF_PARALLAXE; }
+	public function getCOEF_PARALLAXE() : Point { return _COEF_PARALLAXE; }
 	public function getIS_CYCLE_GROUND() : Bool { return _IS_CYCLE_GROUND; }
 	public function getIS_DEPTH_GROUND() : Bool { return _IS_DEPTH_GROUND; }
 	

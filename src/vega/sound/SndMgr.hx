@@ -105,6 +105,7 @@ class SndMgr {
 		tracks = new Map<String,SndTrack>();
 		
 		if ( ! isHowlerEndInit()) VegaFramer.getInstance().addIterator( checkHolwerEndInit);
+		else onHowlerEndInit();
 	}
 	
 	/**

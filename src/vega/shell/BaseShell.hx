@@ -136,7 +136,7 @@ class BaseShell implements IShell {
 		
 		setCurScreen( getScreenMain());
 		
-		ApplicationMatchSize.instance.antiFlicker();
+		//ApplicationMatchSize.instance.antiFlicker();
 	}
 	
 	function setCurScreen( pScreen : MyScreen) : Void {

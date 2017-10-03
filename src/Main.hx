@@ -36,10 +36,13 @@ class Main extends ApplicationMatchSize {
 	}
 	
 	override function init() {
+		legacy = true;
+		transparent = true;
+		
 		//debugLvl = "INFO";
 		debug = true;
 		debugVisibleInit = true;
-		//debugMotifs = [ "VegaOrient"];
+		debugMotifs = [ "Snd"];
 		
 		setFPS( 60);
 		
@@ -49,7 +52,7 @@ class Main extends ApplicationMatchSize {
 		
 		super.init();
 		
-		traceDebug( version + ";" + Pixi.VERSION, true);
+		traceDebug( version + ";" + Pixi.VERSION + ";" + renderer.type, true);
 	}
 	
 	function startShell( pDT : Float) : Void {

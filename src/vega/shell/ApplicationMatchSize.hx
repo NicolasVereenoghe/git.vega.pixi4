@@ -286,7 +286,11 @@ class ApplicationMatchSize extends Application {
 	/**
 	 * hack pour éviter le clignotement sur de vieux devices ; on force un resize à la taille actuelle ; à appeler une fois quand on est au title screen
 	 */
-	public function antiFlicker() : Void { renderer.resize( width, height); }
+	public function antiFlicker() : Void {
+		traceDebug( "INFO : ApplicationMatchSize::antiFlicker", true);
+		
+		renderer.resize( width, height);
+	}
 	
 	/**
 	 * on force la réinitialisation des interactions de bouton / touche
@@ -318,8 +322,11 @@ class ApplicationMatchSize extends Application {
 		// hack samsung flicker
 		/*try{
 			var lPixi:Dynamic = untyped __js__("PIXI");
+			
+			trace( "INFO : ApplicationMatchSize::init : FORCE_NATIVE=" + lPixi.glCore.VertexArrayObject.FORCE_NATIVE);
+			
 			lPixi.glCore.VertexArrayObject.FORCE_NATIVE = true;
-		}catch( pE : Dynamic) { trace( pE); }*/
+		}catch( pE : Dynamic) { trace( "ERROR : ApplicationMatchSize::init : flicker hack fails"); }*/
 		
 		start();
 		

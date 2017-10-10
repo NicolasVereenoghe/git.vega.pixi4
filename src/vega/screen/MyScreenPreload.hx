@@ -77,6 +77,7 @@ class MyScreenPreload extends MyScreenLoad {
 	}
 	
 	function refreshBar() : Void {
-		bar.scale.x = Math.max( .005, curRate) * ApplicationMatchSize.instance.getScreenRect().width / ApplicationMatchSize.instance.getScreenRectExt().width;
+		if ( BAR_RECT == null) bar.scale.x = Math.max( .005, curRate) * ApplicationMatchSize.instance.getScreenRect().width / ApplicationMatchSize.instance.getScreenRectExt().width;
+		else bar.scale.x = Math.max( .005, curRate);
 	}
 }

@@ -159,7 +159,8 @@ class BaseShell implements IShell {
 		
 		setCurScreen( getScreenPreload());
 		
-		pLoader.addTxtFile( _localFile);
+		if ( _localFile != null) pLoader.addTxtFile( _localFile);
+		
 		pLoader.addTxtFile( _assetsFile);
 		
 		for ( lId in Reflect.fields( _fonts)) pLoader.addFontFile( lId, cast( Reflect.getProperty( _fonts, lId), MyFile));
@@ -182,7 +183,11 @@ class BaseShell implements IShell {
 	/**
 	 * création du singleton du gestionnaire de localisation
 	 */
-	function instanciateLocalMgr() : Void { new LocalMgr( VegaLoaderMgr.getInstance().getLoadingFile( _localFile.getId()).getLoadedContent()); }
+	function instanciateLocalMgr() : Void {
+		if ( _localFile == null) return;
+		
+		new LocalMgr( VegaLoaderMgr.getInstance().getLoadingFile( _localFile.getId()).getLoadedContent());
+	}
 	
 	/**
 	 * création du singleton de gestion d'assets

@@ -24,7 +24,7 @@ class MyScreenMain extends MyScreen {
 	}
 	
 	override public function destroy() : Void {
-		if ( asset != null) LocalMgr.instance.recursiveFreeLocalTxt( cast asset.getContent());
+		if ( asset != null && LocalMgr.instance != null) LocalMgr.instance.recursiveFreeLocalTxt( cast asset.getContent());
 		
 		if ( startBt != null){
 			UtilsPixi.unsetQuickBt( startBt);
@@ -59,7 +59,7 @@ class MyScreenMain extends MyScreen {
 			
 			buildContentStart();
 			
-			LocalMgr.instance.recursiveSetLocalTxt( cast asset.getContent());
+			if( LocalMgr.instance != null) LocalMgr.instance.recursiveSetLocalTxt( cast asset.getContent());
 		}
 	}
 	

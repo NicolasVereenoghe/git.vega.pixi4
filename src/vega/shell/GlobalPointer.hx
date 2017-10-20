@@ -5,6 +5,7 @@ import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import pixi.interaction.InteractionEvent;
 import pixi.interaction.InteractionData;
+import haxe.extern.EitherType;
 
 /**
  * tracking de coordonnées globales de pointeur
@@ -98,7 +99,7 @@ class GlobalPointer {
 	 * @param	pId		identifiant de touche recherchée
 	 * @return	descripteur de touche correspondant, ou null si inexistant
 	 */
-	public function getTouchId( pId : Int) : TouchDesc {
+	public function getTouchId( pId : EitherType<String,Int>) : TouchDesc {
 		var lTouch	: TouchDesc;
 		
 		if ( pId == null) pId = DEFAULT_ID;
@@ -387,11 +388,11 @@ class TouchDesc {
 	public var delay			: Float;
 	public var isMouse			: Bool;
 	public var isDown			: Bool;
-	public var id				: Int;
+	public var id				: EitherType<String,Int>;
 	
-	public var isBound			: Bool				= false;
+	public var isBound			: Bool						= false;
 	
-	public function new( pCoord : Point, pIsMouse : Bool, pIsDown : Bool, pId : Int) {
+	public function new( pCoord : Point, pIsMouse : Bool, pIsDown : Bool, pId : EitherType<String,Int>) {
 		/*if( pIsMouse){
 			ApplicationMatchSize.instance.traceDebug( "INFO : TouchDesc::TouchDesc : isMouse=" + pIsMouse + " ; isDown=" + pIsDown + " ; id=" + pId, true);
 			

@@ -1,5 +1,7 @@
 package vega.shell;
 import pixi.core.display.Container;
+import pixi.core.display.DisplayObject.DestroyOptions;
+import haxe.extern.EitherType;
 
 /**
  * interface de HUD de jeu
@@ -17,7 +19,7 @@ interface IMyHUD {
 	/**
 	 * destruction de l'interface HUD
 	 */
-	function destroy() : Void;
+	function destroy( ?options : EitherType<Bool,DestroyOptions>) : Void;
 	
 	/**
 	 * itération de frame du hud

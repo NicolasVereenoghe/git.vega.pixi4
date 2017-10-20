@@ -1,6 +1,7 @@
 package labo.shell;
 
 import pixi.core.display.Container;
+import pixi.core.display.DisplayObject.DestroyOptions;
 import pixi.core.math.shapes.Rectangle;
 import pixi.flump.Movie;
 import pixi.interaction.InteractionEvent;
@@ -13,6 +14,7 @@ import vega.shell.ResizeBroadcaster;
 import vega.sound.SndMgr;
 import vega.ui.MyButtonFlump;
 import vega.utils.UtilsFlump;
+import haxe.extern.EitherType;
 
 /**
  * ...
@@ -40,7 +42,7 @@ class MyHUD implements IMyHUD {
 		onResize();
 	}
 	
-	public function destroy() : Void {
+	public function destroy( ?options : EitherType<Bool,DestroyOptions>) : Void {
 		// TODO !!
 		freeAsset();
 		

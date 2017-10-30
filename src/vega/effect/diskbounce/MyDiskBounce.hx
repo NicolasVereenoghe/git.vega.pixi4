@@ -1,6 +1,7 @@
 package vega.effect.diskbounce;
 import haxe.io.Error;
 import pixi.core.math.Point;
+import pixi.core.math.shapes.Circle;
 import pixi.core.math.shapes.Rectangle;
 import vega.utils.Utils;
 import vega.utils.UtilsPixi;
@@ -75,36 +76,86 @@ class MyDiskBounce {
 		return ( lDX * lDX + lDY * lDY <= ( ray + pDisk.ray) * ( ray + pDisk.ray));
 	}
 	
-	public function doBounceWithDiskBounce( pDisk : MyDiskBounce, pReflectTransmit : Bool = true) : Bool {
+	public function doBounceWithDiskBounce( pDisk : MyDiskBounce, pReflectTransmit : Bool = true, pUseSpeedIfTooClose : Bool = false, pHaltNReflect : Bool = false) : Bool {
 		var lDX		: Float	= pDisk.x - x;
 		var lDY		: Float	= pDisk.y - y;
 		var lDist	: Float	= lDX * lDX + lDY * lDY;
 		var lDA		: Float;
 		var lA		: Float;
 		
-		if ( lDist < ( ray + pDisk.ray) * ( ray + pDisk.ray) && lDist > ignoreBDist * ignoreBDist){
+		if ( lDist < ( ray + pDisk.ray) * ( ray + pDisk.ray)){
+			if ( lDist <= ignoreBDist * ignoreBDist){
+				if ( pUseSpeedIfTooClose){
+					lDX		= pDisk.x - ( x - vx);
+					lDY		= pDisk.y - ( y - vy);
+					lDist	= lDX * lDX + lDY * lDY;
+					
+					if ( lDist <= ignoreBDist * ignoreBDist) return false;
+					else{
+						lA		= Utils.modA( Math.atan2( lDY, lDX));
+						lDist	= Math.max( ray, pDisk.ray);
+						
+						addBStack( -Math.cos( lA) * lDist, -Math.sin( lA) * lDist);
+						
+						if ( pReflectTransmit) doReflectTransmit( pDisk, lA, pHaltNReflect);
+						
+						return true;
+					}
+				}else return false;
+			}
+			
 			lA		= Utils.modA( Math.atan2( lDY, lDX));
 			lDist	= Math.sqrt( lDist);
 			
-			if ( lDist > pDisk.ray + diskAbsorbOffset || lDist > ray + diskAbsorbOffset){
+			if ( lDist > Math.abs( ray - pDisk.ray) + diskAbsorbOffset){
 				if( isPairsValid){
 					lDA		= Utils.modA( secureACos( ( lDist * lDist + ray * ray - pDisk.ray * pDisk.ray) / ( 2 * lDist * ray)));
 					
 					addBPair( Utils.modA( lA - lDA), Utils.modA( lA + lDA));
 				}
 			}else{
-				// absorb
 				lDist = pDisk.ray + ray - lDist;
 				
 				addBStack( -Math.cos( lA) * lDist, -Math.sin( lA) * lDist);
 			}
 			
-			if ( pReflectTransmit) doReflectTransmit( pDisk, lA);
+			if ( pReflectTransmit) doReflectTransmit( pDisk, lA, pHaltNReflect);
 			
 			return true;
 		}
 		
 		return false;
+	}
+	
+	public function doBounceInsideCircle( pCircle : Circle, pReflectTransmit : Bool = true) : Void {
+		var lDX		: Float	= pCircle.x - x;
+		var lDY		: Float	= pCircle.y - y;
+		var lDist	: Float	= lDX * lDX + lDY * lDY;
+		var lDiff	: Float	= pCircle.radius - ray;
+		var lDA		: Float;
+		var lA		: Float;
+		
+		if ( lDist > lDiff * lDiff){
+			lA		= Utils.modA( Math.atan2( lDY, lDX));
+			lDist	= Math.sqrt( lDist);
+			
+			if ( lDist + diskAbsorbOffset < ray + pCircle.radius){
+				if ( isPairsValid){
+					lDA		= Utils.modA( secureACos( ( lDist * lDist + ray * ray - pCircle.radius * pCircle.radius) / ( 2 * lDist * ray)));
+					
+					addBPair( Utils.modA( lA + lDA), Utils.modA( lA - lDA));
+				}
+			}else{
+				lDist = lDist - pCircle.radius + ray;
+				
+				addBStack( Math.cos( lA) * lDist, Math.sin( lA) * lDist);
+			}
+		}
+		
+		// TODO !!
+		
+		// TODO : diskAbsorbOffset
+		// TODO : pReflectTransmit
 	}
 	
 	public function doBounceOutsideBox( pBox : Rectangle, pReflectTransmit : Bool = true) : Void {
@@ -625,7 +676,7 @@ class MyDiskBounce {
 		bStack.y	+= pDY;
 	}
 	
-	function doReflectTransmit( pDisk : MyDiskBounce, pA : Float) : Void {
+	function doReflectTransmit( pDisk : MyDiskBounce, pA : Float, pHaltNReflect : Bool) : Void {
 		var lCos	: Float		= Math.cos( pA);
 		var lSin	: Float		= Math.sin( pA);
 		var lP1		: Float		= vx * lCos + vy * lSin;
@@ -640,10 +691,17 @@ class MyDiskBounce {
 				lMu			= 1 / ( ( 1 / masse) + ( 1 / pDisk.masse));
 				lR			= 2 * lMu * ( lP2 - lP1);
 				
-				vx			+= ( lR * lCos) / ( masse);
-				vy			+= ( lR * lSin) / ( masse);
-				pDisk.vx	-= ( lR * lCos) / ( pDisk.masse);
-				pDisk.vy	-= ( lR * lSin) / ( pDisk.masse);
+				if( pHaltNReflect){
+					vx			= ( lR * lCos) / ( masse);
+					vy			= ( lR * lSin) / ( masse);
+					pDisk.vx	= -( lR * lCos) / ( pDisk.masse);
+					pDisk.vy	= -( lR * lSin) / ( pDisk.masse);
+				}else{
+					vx			+= ( lR * lCos) / ( masse);
+					vy			+= ( lR * lSin) / ( masse);
+					pDisk.vx	-= ( lR * lCos) / ( pDisk.masse);
+					pDisk.vy	-= ( lR * lSin) / ( pDisk.masse);
+				}
 			}else{
 				lVX			= vx - pDisk.vx;
 				lVY			= vy - pDisk.vy;

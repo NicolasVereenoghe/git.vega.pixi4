@@ -1,3 +1,4 @@
+import haxe.Timer;
 import js.html.Performance;
 import js.html.DivElement;
 import js.Browser;
@@ -24,6 +25,8 @@ import js.Browser;
 	public static var TOP_RIGHT:String = "TR";
 	public static var BOTTOM_LEFT:String = "BL";
 	public static var BOTTOM_RIGHT:String = "BR";
+
+	static var POS_SUFFIX:String = "px";
 
 	static var DELAY_TIME:Int = 4000;
 
@@ -57,7 +60,10 @@ import js.Browser;
 	var RAF:Dynamic;
 	var CAF:Dynamic;
 
+	var _divElements:Array<DivElement>;
+
 	public function new(?pos = "TR", ?offset:Float = 0) {
+		_divElements = [];
 		_perfObj = Browser.window.performance;
 		if (Reflect.field(_perfObj, "memory") != null) _memoryObj = Reflect.field(_perfObj, "memory");
 		_memCheck = (_perfObj != null && _memoryObj != null && _memoryObj.totalJSHeapSize > 0);
@@ -70,15 +76,29 @@ import js.Browser;
 		_createMsDom();
 		if (_memCheck) _createMemoryDom();
 
+		var lastTime:Float = 0;
+		var id:Timer = null;
+
 		if (Browser.window.requestAnimationFrame != null) RAF = Browser.window.requestAnimationFrame;
-		else if (untyped __js__("window").mozRequestAnimationFrame != null) RAF = untyped __js__("window").mozRequestAnimationFrame;
-		else if (untyped __js__("window").webkitRequestAnimationFrame != null) RAF = untyped __js__("window").webkitRequestAnimationFrame;
-		else if (untyped __js__("window").msRequestAnimationFrame != null) RAF = untyped __js__("window").msRequestAnimationFrame;
+		else {
+			RAF = function(callback) {
+				var currTime = _now();
+				var timeToCall = Std.int(Math.max(0, 16 - (currTime - lastTime)));
+				id = Timer.delay(function() { callback(currTime + timeToCall); }, timeToCall);
+				lastTime = currTime + timeToCall;
+				return id;
+			};
+		}
 
 		if (Browser.window.cancelAnimationFrame != null) CAF = Browser.window.cancelAnimationFrame;
-		else if (untyped __js__("window").mozCancelAnimationFrame != null) CAF = untyped __js__("window").mozCancelAnimationFrame;
-		else if (untyped __js__("window").webkitCancelAnimationFrame != null) CAF = untyped __js__("window").webkitCancelAnimationFrame;
-		else if (untyped __js__("window").msCancelAnimationFrame != null) CAF = untyped __js__("window").msCancelAnimationFrame;
+		else {
+			CAF = function(id:Timer) {
+				if (id != null) {
+					id.stop();
+					id = null;
+				}
+			};
+		}
 
 		if (RAF != null) _raf = Reflect.callMethod(Browser.window, RAF, [_tick]);
 	}
@@ -114,6 +134,7 @@ import js.Browser;
 			ms.innerHTML = "MS: " + currentMs;
 
 			currentFps = Math.round((_ticks * 1000) / (time - _prevTime));
+			if (currentFps > 60) currentFps = 60;
 			if (currentFps > 0 && val > DELAY_TIME) {
 				_measureCount++;
 				_totalFps += currentFps;
@@ -149,17 +170,17 @@ import js.Browser;
 
 		switch (_pos) {
 			case "TL":
-				div.style.left = _offset + "px";
-				div.style.top = top + "px";
+				div.style.left = _offset + POS_SUFFIX;
+				div.style.top = top + POS_SUFFIX;
 			case "TR":
-				div.style.right = _offset + "px";
-				div.style.top = top + "px";
+				div.style.right = _offset + POS_SUFFIX;
+				div.style.top = top + POS_SUFFIX;
 			case "BL":
-				div.style.left = _offset + "px";
-				div.style.bottom = ((_memCheck) ? 48 : 32) - top + "px";
+				div.style.left = _offset + POS_SUFFIX;
+				div.style.bottom = ((_memCheck) ? 48 : 32) - top + POS_SUFFIX;
 			case "BR":
-				div.style.right = _offset + "px";
-				div.style.bottom = ((_memCheck) ? 48 : 32) - top + "px";
+				div.style.right = _offset + POS_SUFFIX;
+				div.style.bottom = ((_memCheck) ? 48 : 32) - top + POS_SUFFIX;
 		}
 
 		div.style.width = "80px";
@@ -171,6 +192,7 @@ import js.Browser;
 		div.style.fontWeight = "bold";
 		div.style.textAlign = "center";
 		Browser.document.body.appendChild(div);
+		_divElements.push(div);
 		return div;
 	}
 
@@ -239,6 +261,14 @@ import js.Browser;
 		}
 		clearInfo();
 		_init();
+	}
+
+	public function hide() {
+		for (div in _divElements) div.style.visibility = "hidden";
+	}
+
+	public function show() {
+		for (div in _divElements) div.style.visibility = "visible";
 	}
 
 	inline function _cancelRAF() {

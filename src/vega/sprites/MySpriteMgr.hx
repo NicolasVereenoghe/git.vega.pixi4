@@ -1,4 +1,5 @@
 package vega.sprites;
+import js.Error;
 import pixi.core.display.Container;
 import pixi.core.math.Point;
 import vega.camera.MyCamera;
@@ -63,12 +64,11 @@ class MySpriteMgr {
 	
 	public function destroy() : Void {
 		var lSps	: Array<MySprite>;
-		var lSp		: MySprite;
 		
 		freeGrounds();
 		
 		lSps = sprites.copy();
-		for ( lSp in lSps) remSpriteDisplay( lSp);
+		for ( iSp in lSps) remSpriteDisplay( iSp);
 		
 		freeContainers();
 		
@@ -90,17 +90,19 @@ class MySpriteMgr {
 	 * @return	liste de sprites trouvés
 	 */
 	public function getSpritesAt( pGroundId : String, pX : Float, pY : Float) : Array<MySprite> {
-		var lGround	: GroundMgr				= getGround( pGroundId);
-		var lLvlG	: LvlGroundMgr			= lGround.getLvlGround();
-		var lIMod	: Int					= lLvlG.x2ModI( pX);
-		var lJMod	: Int					= lLvlG.y2ModJ( pY);
-		var lIJ		: PointIJ				= new PointIJ( lLvlG.x2i( pX), lLvlG.y2j( pY));
-		var lCells	: Map<String,MyCell>	= lGround.getCellsAt( lIMod, lJMod);
-		var lSps	: Array<MySprite>		= [];
-		var lCell	: MyCell;
+		var lGround	: GroundMgr					= getGround( pGroundId);
+		var lLvlG	: LvlGroundMgr				= lGround.getLvlGround();
+		var lIMod	: Int						= lLvlG.x2ModI( pX);
+		var lJMod	: Int						= lLvlG.y2ModJ( pY);
+		var lIJ		: PointIJ					= new PointIJ( lLvlG.x2i( pX), lLvlG.y2j( pY));
+		var lCells	: Array<Map<String,MyCell>>	= lGround.getCellsAt( lIMod, lJMod);
+		var lSps	: Array<MySprite>			= [];
 		
-		if ( lCells != null) for ( lCell in lCells) Reflect.callMethod( lSps, lSps.push, lGround.getSpriteCell( lCell, lIJ));
-		//if( lCells != null) for ( lCell in lCells) lSps = lSps.concat( lGround.getSpriteCell( lCell, lIJ));
+		for ( iMap in lCells){
+			//for( iCell in iMap) Reflect.callMethod( lSps, lSps.push, lGround.getSpriteCell( iCell, lIJ));
+			
+			for ( iCell in iMap) lSps = lSps.concat( lGround.getSpriteCell( iCell, lIJ));
+		}
 		
 		return lSps;
 	}
@@ -185,11 +187,7 @@ class MySpriteMgr {
 	 * on bascule la pause pour notifier tous les sprites
 	 * @param	pIsPause	true pour mettre en pause, false pour reprendre la lecture
 	 */
-	public function switchPause( pIsPause : Bool) : Void {
-		var lSp	: MySprite;
-		
-		for ( lSp in sprites) lSp.switchPause( pIsPause);
-	}
+	public function switchPause( pIsPause : Bool) : Void { for ( iSp in sprites) iSp.switchPause( pIsPause); }
 	
 	/**
 	 * on effectue l'itération de frame : déplacement d'affichage suivant la caméra et forward d'itération de frame aux sprites du gestionnaire
@@ -212,18 +210,14 @@ class MySpriteMgr {
 	 * on déplace le conteneur de sprite pour suivre la caméra, et on forward le suivi de caméra aux plans de sprites pour le clipping
 	 */
 	function slideToCamera() : Void {
-		var lG	: GroundMgr;
-		
 		container.x	= _camera.getX();
 		container.y	= _camera.getY();
 		
-		for ( lG in grounds) lG.slideToCamera();
+		for ( iG in grounds) iG.slideToCamera();
 	}
 	
 	function freeGrounds() : Void {
-		var lG	: GroundMgr;
-		
-		for ( lG in grounds) lG.destroy();
+		for ( iG in grounds) iG.destroy();
 	}
 	
 	/**

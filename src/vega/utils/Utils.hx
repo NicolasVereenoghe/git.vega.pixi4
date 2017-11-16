@@ -71,6 +71,41 @@ class Utils {
 	}
 	
 	/**
+	 * on génère un nuages de points répartis de manière homogène dans un disque unitaire
+	 * @param	pNbConcentric	nombre de cercle concentriques à générer dans le disque (min=1)
+	 * @return	liste de points ( x:[0], y:[1]) sur le disque unitaire
+	 * @see		http://www.holoborodko.com/pavel/2015/07/23/generating-equidistant-points-on-unit-disk/
+	 */
+	public static function generateCloudInDisk( pNbConcentric : Int) : Array<Array<Float>> {
+		var lRes	: Array<Array<Float>>	= [ [ 0, 0]];
+		var lIDisk	: Int					= 1;
+		var lNb		: Int;
+		var lR		: Float;
+		var lIA		: Int;
+		var lA		: Float;
+		
+		if ( pNbConcentric < 1) pNbConcentric = 1;
+		
+		while ( lIDisk <= pNbConcentric){
+			lNb	= Math.round( Math.PI / Math.asin( 1 / ( 2 * lIDisk)));
+			lR	= lIDisk / pNbConcentric;
+			
+			lIA = 0;
+			while ( lIA < lNb){
+				lA	= 2 * Math.PI * lIA++ / lNb;
+				lRes.push( [
+					lR * Math.cos( lA),
+					lR * Math.sin( lA)
+				]);
+			}
+			
+			lIDisk++;
+		}
+		
+		return lRes;
+	}
+	
+	/**
 	 * calcule de racine cubique
 	 * @param	pVal	valeur au cube
 	 * @return	racine cubique

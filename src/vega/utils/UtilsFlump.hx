@@ -237,6 +237,17 @@ class UtilsFlump {
 		else return null;
 	}
 	
+	/**
+	 * on positionne la tête de lecture d'un movie synchrone avec la date système
+	 * @param	pMovie	movie dont on positionne la tête de lecture
+	 * @return	le movie piloté
+	 */
+	public static function gotoSyncDate( pMovie : Movie) : Movie {
+		pMovie.gotoAndStop( Math.floor( Date.now().getTime() / getMovieFrameTime( pMovie.symbolId)) % pMovie.totalFrames);
+		
+		return pMovie;
+	}
+	
 	public static function recursiveStop( pCont : Container) : Void {
 		var lChild	: DisplayObject;
 		

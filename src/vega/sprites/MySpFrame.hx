@@ -77,13 +77,12 @@ class MySpFrame extends MySprite {
 		var lXY		: Point					= getGrav();
 		var lIJ		: PointIJ				= new PointIJ( lLvl.x2i( x), lLvl.y2j( y));
 		var lCells	: Map<String,MyCell>	= lLvl.getCellsAt( lLvl.x2ModI( x), lLvl.y2ModJ( y));
-		var lCell	: MyCell;
 		var lSps	: Array<MySprite>;
 		var lSp		: MySprite;
 		
 		if( lCells != null){
-			for ( lCell in lCells) {
-				lSps	= mgr.getSpriteCell( lCell, lIJ);
+			for ( iCell in lCells) {
+				lSps	= mgr.getSpriteCell( iCell, lIJ);
 				
 				for ( lSp in lSps){
 					if ( lSp != this) onEffect( lSp, lXY);

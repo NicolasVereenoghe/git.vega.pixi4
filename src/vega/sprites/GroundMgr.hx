@@ -69,9 +69,7 @@ class GroundMgr {
 	}
 	
 	public function destroy() : Void {
-		var lSp	: MySprite;
-		
-		for ( lSp in sprites) remSpriteDisplay( lSp);
+		for ( iSp in sprites) remSpriteDisplay( iSp);
 		sprites = null;
 		
 		freeContainer();
@@ -84,7 +82,12 @@ class GroundMgr {
 		COEF_P		= null;
 	}
 	
-	public function getCellsAt( pModI : Int, pModJ : Int, pType : Class<MySprite> = null) : Map<String,MyCell> { return _lvlGround.getCellsAt( pModI, pModJ, pType); }
+	public function getCellsAt( pModI : Int, pModJ : Int, pType : Class<MySprite> = null) : Array<Map<String,MyCell>> {
+		var lCells	: Map<String,MyCell>	= _lvlGround.getCellsAt( pModI, pModJ, pType);
+		
+		if ( Utils.isMapEmpty( lCells)) return [];
+		else return [ lCells];
+	}
 	
 	public function getLvlGround() : LvlGroundMgr { return _lvlGround; }
 	
@@ -397,13 +400,12 @@ class GroundMgr {
 	}
 	
 	function clipRectOutRegular( pI : Int, pJ : Int, pW : Int, pH : Int, pClipRIJ : RectangleIJ) : Void {
-		var lDone			: Map<String,Bool>		= new Map<String,Bool>();
-		var lIMax			: Int					= pI + pW;
-		var lJMax			: Int					= pJ + pH;
-		var lI				: Int					= pI;
+		var lDone			: Map<String,Bool>			= new Map<String,Bool>();
+		var lIMax			: Int						= pI + pW;
+		var lJMax			: Int						= pJ + pH;
+		var lI				: Int						= pI;
 		var lJ				: Int;
 		var lDescs			: Map<String,MyCell>;
-		var lDesc			: MyCell;
 		var lCellClipRIJ	: RectangleIJ;
 		var lSp				: MySprite;
 		
@@ -412,15 +414,15 @@ class GroundMgr {
 			while ( lJ < lJMax) {
 				lDescs	= _lvlGround.getCellsAt( lI, lJ);
 				
-				if( lDescs != null){
-					for ( lDesc in lDescs) {
-						if ( ! lDone.exists( lDesc.getInstanceId())) {
-							lDone[ lDesc.getInstanceId()] = true;
-							lSp = sprites[ lDesc.getInstanceId()];
+				if( ! Utils.isMapEmpty( lDescs)){
+					for ( iDesc in lDescs) {
+						if ( ! lDone.exists( iDesc.getInstanceId())) {
+							lDone[ iDesc.getInstanceId()] = true;
+							lSp = sprites[ iDesc.getInstanceId()];
 							
 							if ( lSp != null && lSp.isClipable()) {
-								lCellClipRIJ	= lDesc.getCellOffset().clone();
-								lCellClipRIJ.offset( lDesc.getI(), lDesc.getJ());
+								lCellClipRIJ	= iDesc.getCellOffset().clone();
+								lCellClipRIJ.offset( iDesc.getI(), iDesc.getJ());
 								
 								if( pClipRIJ.getLeft() > lCellClipRIJ.getRight() || pClipRIJ.getRight() < lCellClipRIJ.getLeft() || pClipRIJ.getTop() > lCellClipRIJ.getBottom() || pClipRIJ.getBottom() < lCellClipRIJ.getTop()){
 									spMgr.remSpriteDisplay( lSp);
@@ -438,17 +440,16 @@ class GroundMgr {
 	}
 	
 	function clipRectOutCycle( pI : Int, pJ : Int, pW : Int, pH : Int, pClipRIJ : RectangleIJ) : Void {
-		var lDone			: Map<String,Bool>		= new Map<String,Bool>();
-		var lIMax			: Int					= pI + pW;
-		var lJMax			: Int					= pJ + pH;
-		var lI				: Int					= pI;
+		var lDone			: Map<String,Bool>			= new Map<String,Bool>();
+		var lIMax			: Int						= pI + pW;
+		var lJMax			: Int						= pJ + pH;
+		var lI				: Int						= pI;
 		var lJ				: Int;
 		var lIMod			: Int;
 		var lJMod			: Int;
 		var lDescs			: Map<String,MyCell>;
 		var lGroundOffset	: PointIJ;
 		var lOffset			: PointIJ;
-		var lDesc			: MyCell;
 		var lName			: String;
 		var lCellClipRIJ	: RectangleIJ;
 		var lOffsets		: RectangleIJ;
@@ -465,24 +466,24 @@ class GroundMgr {
 				lDescs			= _lvlGround.getCellsAt( lIMod, lJMod);
 				lGroundOffset	= _lvlGround.getGroundOffset( lI, lJ);
 				
-				if( lDescs != null){
-					for ( lDesc in lDescs) {
-						lOffsets	= _lvlGround.getCellGroundOffsetsFrom( lIMod, lJMod, lDesc);
+				if( ! Utils.isMapEmpty( lDescs)){
+					for ( iDesc in lDescs) {
+						lOffsets	= _lvlGround.getCellGroundOffsetsFrom( lIMod, lJMod, iDesc);
 						
 						lIO = lOffsets.getLeft();
 						while ( lIO <= lOffsets.getRight()) {
 							lJO = lOffsets.getTop();
 							while ( lJO <= lOffsets.getBottom()) {
 								lOffset	= new PointIJ( lIO + lGroundOffset.i, lJO + lGroundOffset.j);
-								lName	= getInstanceQualifiedGroundName( lDesc, lOffset);
+								lName	= getInstanceQualifiedGroundName( iDesc, lOffset);
 								
 								if ( ! lDone.exists( lName)) {
 									lDone[ lName] = true;
 									lSp = sprites[ lName];
 									
 									if ( lSp != null && lSp.isClipable()) {
-										lCellClipRIJ	= lDesc.getCellOffset().clone();
-										lCellClipRIJ.offset( lOffset.i * _lvlGround.getCELLS_PER_W() + lDesc.getI(), lOffset.j * _lvlGround.getCELLS_PER_H() + lDesc.getJ());
+										lCellClipRIJ	= iDesc.getCellOffset().clone();
+										lCellClipRIJ.offset( lOffset.i * _lvlGround.getCELLS_PER_W() + iDesc.getI(), lOffset.j * _lvlGround.getCELLS_PER_H() + iDesc.getJ());
 										
 										if ( pClipRIJ.getLeft() > lCellClipRIJ.getRight() || pClipRIJ.getRight() < lCellClipRIJ.getLeft() || pClipRIJ.getTop() > lCellClipRIJ.getBottom() || pClipRIJ.getBottom() < lCellClipRIJ.getTop()) {
 											spMgr.remSpriteDisplay( lSp);
@@ -506,27 +507,26 @@ class GroundMgr {
 	}
 	
 	function clipRectInRegular( pI : Int, pJ : Int, pW : Int, pH : Int) : Void {
-		var lIMax			: Int					= pI + pW;
-		var lJMax			: Int					= pJ + pH;
-		var lI				: Int					= pI;
+		var lIMax			: Int						= pI + pW;
+		var lJMax			: Int						= pJ + pH;
+		var lI				: Int						= pI;
 		var lJ				: Int;
 		var lDescs			: Map<String,MyCell>;
-		var lDesc			: MyCell;
 		
 		while ( lI < lIMax) {
 			lJ = pJ;
 			while ( lJ < lJMax) {
 				lDescs	= _lvlGround.getCellsAt( lI, lJ);
 				
-				if( lDescs != null){
-					for ( lDesc in lDescs) {
-						if ( ! sprites.exists( lDesc.getInstanceId())) {
+				if( ! Utils.isMapEmpty( lDescs)){
+					for ( iDesc in lDescs) {
+						if ( ! sprites.exists( iDesc.getInstanceId())) {
 							spMgr.addSpriteDisplay(
-								lDesc.instanciate(),
-								lDesc.getI() * _lvlGround.getCELL_W() + lDesc.getDx(),
-								lDesc.getJ() * _lvlGround.getCELL_H() + lDesc.getDy(),
-								lDesc.getInstanceId(),
-								lDesc
+								iDesc.instanciate(),
+								iDesc.getI() * _lvlGround.getCELL_W() + iDesc.getDx(),
+								iDesc.getJ() * _lvlGround.getCELL_H() + iDesc.getDy(),
+								iDesc.getInstanceId(),
+								iDesc
 							);
 						}
 					}
@@ -540,16 +540,15 @@ class GroundMgr {
 	}
 	
 	function clipRectInCycle( pI : Int, pJ : Int, pW : Int, pH : Int) : Void {
-		var lIMax			: Int			= pI + pW;
-		var lJMax			: Int			= pJ + pH;
-		var lI				: Int			= pI;
+		var lIMax			: Int						= pI + pW;
+		var lJMax			: Int						= pJ + pH;
+		var lI				: Int						= pI;
 		var lJ				: Int;
 		var lIMod			: Int;
 		var lJMod			: Int;
 		var lDescs			: Map<String,MyCell>;
 		var lGroundOffset	: PointIJ;
 		var lOffset			: PointIJ;
-		var lDesc			: MyCell;
 		var lName			: String;
 		var lOffsets		: RectangleIJ;
 		var lIO				: Int;
@@ -564,24 +563,24 @@ class GroundMgr {
 				lDescs			= _lvlGround.getCellsAt( lIMod, lJMod);
 				lGroundOffset	= _lvlGround.getGroundOffset( lI, lJ);
 				
-				if( lDescs != null){
-					for ( lDesc in lDescs) {
-						lOffsets	= _lvlGround.getCellGroundOffsetsFrom( lIMod, lJMod, lDesc);
+				if( ! Utils.isMapEmpty( lDescs)){
+					for ( iDesc in lDescs) {
+						lOffsets	= _lvlGround.getCellGroundOffsetsFrom( lIMod, lJMod, iDesc);
 						
 						lIO = lOffsets.getLeft();
 						while ( lIO <= lOffsets.getRight()) {
 							lJO = lOffsets.getTop();
 							while ( lJO <= lOffsets.getBottom()) {
 								lOffset	= new PointIJ( lIO + lGroundOffset.i, lJO + lGroundOffset.j);
-								lName	= getInstanceQualifiedGroundName( lDesc, lOffset);
+								lName	= getInstanceQualifiedGroundName( iDesc, lOffset);
 								
 								if ( ! sprites.exists( lName)) {
 									spMgr.addSpriteDisplay(
-										lDesc.instanciate(),
-										( lOffset.i * _lvlGround.getCELLS_PER_W() + lDesc.getI()) * _lvlGround.getCELL_W() + lDesc.getDx(),
-										( lOffset.j * _lvlGround.getCELLS_PER_H() + lDesc.getJ()) * _lvlGround.getCELL_H() + lDesc.getDy(),
+										iDesc.instanciate(),
+										( lOffset.i * _lvlGround.getCELLS_PER_W() + iDesc.getI()) * _lvlGround.getCELL_W() + iDesc.getDx(),
+										( lOffset.j * _lvlGround.getCELLS_PER_H() + iDesc.getJ()) * _lvlGround.getCELL_H() + iDesc.getDy(),
 										lName,
-										lDesc
+										iDesc
 									);
 								}
 								

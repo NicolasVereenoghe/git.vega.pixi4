@@ -5,6 +5,7 @@ import pixi.core.math.Point;
 import vega.sprites.MySprite;
 import vega.utils.PointIJ;
 import vega.utils.RectangleIJ;
+import vega.utils.Utils;
 
 /**
  * abstract : gestionnaire d'affichage d'un ground composé de plusieurs sections de level ; reste à coder le choix d'enchainement des sections
@@ -25,20 +26,18 @@ class GroundMgrSections extends GroundMgr {
 	}
 	
 	/** @inheritDoc */
-	override public function getCellsAt( pModI : Int, pModJ : Int, pType : Class<MySprite> = null) : Map<String,MyCell> {
-		var lRes 		: Map<String,MyCell>	= super.getCellsAt( pModI, pModJ, pType);
-		var lSection	: SectionDesc			= getLvlGroundSectionAt( pModI, pModJ);
-		var lRes2 		: Map<String,MyCell>	= null;
+	override public function getCellsAt( pModI : Int, pModJ : Int, pType : Class<MySprite> = null) : Array<Map<String,MyCell>> {
+		var lRes 		: Array<Map<String,MyCell>>	= super.getCellsAt( pModI, pModJ, pType);
+		var lSection	: SectionDesc				= getLvlGroundSectionAt( pModI, pModJ);
+		var lRes2		: Map<String,MyCell>;
 		
-		if ( lSection != null) lRes2 = lSection.lvlGround.getCellsAt( pModI - lSection.offset.i, pModJ - lSection.offset.j);
+		if ( lSection != null){
+			lRes2 = lSection.lvlGround.getCellsAt( pModI - lSection.offset.i, pModJ - lSection.offset.j);
+			
+			if ( ! Utils.isMapEmpty( lRes2)) lRes.push( lRes2);
+		}
 		
-		if ( lRes != null){
-			if ( lRes2 != null){
-				for ( iKey in lRes.keys()) lRes2[ iKey] = lRes[ iKey];
-				
-				return lRes2;
-			}else return lRes;
-		}else return lRes2;
+		return lRes;
 	}
 	
 	/**
@@ -70,6 +69,7 @@ class GroundMgrSections extends GroundMgr {
 				lSection = getLvlGroundSectionAt( lI, lJ);
 				if ( lSection != null){
 					lDescs = lSection.lvlGround.getCellsAt( lI - lSection.offset.i, lJ - lSection.offset.j);
+					
 					if ( lDescs != null){
 						for ( iDesc in lDescs){
 							lName = getInstanceQualifiedSectionName( iDesc, lSection);

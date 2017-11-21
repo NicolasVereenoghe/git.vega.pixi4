@@ -6,12 +6,15 @@ package vega.utils;
  */
 class Utils {
 	/** The lowest integer value in Flash and JS. */
-    public static inline var INT_MIN	: Int	= -2147483648;
+    public static inline var INT_MIN		: Int									= -2147483648;
 	/** The highest integer value in Flash and JS. */
-    public static inline var INT_MAX	: Int	= 2147483647;
+    public static inline var INT_MAX		: Int									= 2147483647;
 	
 	/** an arbitrary epsilon constant */
-	public static inline var EPSILON	: Float	= 1e-8;
+	public static inline var EPSILON		: Float									= 1e-8;
+	
+	/** pools de probabilité contrôlée, classés par id de pool */
+	static var PROBA_POOLS					: Map<String,Array<Bool>>				= null;
 	
 	public static function minInt( pA : Int, pB : Int) : Int { return pA < pB ? pA : pB; }
 	public static function maxInt( pA : Int, pB : Int) : Int { return pA > pB ? pA : pB; }
@@ -43,6 +46,98 @@ class Utils {
 		
 		return doesInherit( Type.getSuperClass( pSon), pMother);
 	}
+	
+	/**
+	 * probabilité contrôlée : on garantie une probabilité sur un échantillon de tirages passés significatif par rapport à la probabilité
+	 * @param	pId				identifiant de pool
+	 * @param	pProba			probabilité : [ 0 .. 1]
+	 * @param	pChaosRate		taux de "chaos" pour éviter des schémas répétitifs de probabilité : [ 0 .. 1]
+	 * @param	pPoolLenMax		taille max d'un pool de probabilité contrôlée ; > 0 ; défini aussi la précision max : 1 / pPoolLenMax
+	 * @return	true si la proba se vérifie, false sinon
+	 */
+	public static function isProbaId( pId : String, pProba : Float, pChaosRate : Float = .3, pPoolLenMax : Int = 20) : Bool {
+		var lPool	: Array<Bool>;
+		var lDI		: Int;
+		var lI		: Int;
+		var lNb		: Int;
+		var lCtr	: Int;
+		var lProba	: Float;
+		var lRes	: Bool;
+		
+		if ( pProba <= 0) return false;
+		else if ( pProba >= 1) return true;
+		
+		if ( PROBA_POOLS == null) PROBA_POOLS = new Map<String,Array<Bool>>();
+		
+		if ( ! PROBA_POOLS.exists( pId)){
+			PROBA_POOLS.set( pId, new Array<Bool>());
+			
+			lRes = ( pProba >= .5);
+			
+			PROBA_POOLS.get( pId).push( lRes);
+			
+			return lRes;
+		}
+		
+		lPool = PROBA_POOLS.get( pId);
+		
+		if ( pProba < .5){
+			lNb = Utils.minInt( Math.round( 1 / pProba), pPoolLenMax);
+		}else{
+			lNb	= Utils.minInt( Math.round( 1 / ( 1 - pProba)), pPoolLenMax);
+		}
+		
+		lCtr = 0;
+		lDI = lPool.length - ( lPool.length < lNb ? lPool.length : lNb);
+		lI = lDI;
+		while ( lI < lPool.length){
+			if ( lPool[ lI]) lCtr++;
+			
+			lI++;
+		}
+		
+		lProba = lCtr / lI;
+		
+		if ( Math.abs( pProba - lProba) >= pChaosRate * pProba){
+			if ( lProba == pProba) lRes = lPool[ lDI];
+			else lRes = ( lProba < pProba);
+			
+			lPool.push( lRes);
+			
+			while ( lPool.length > pPoolLenMax) lPool.shift();
+			
+			return lRes;
+		}else{
+			lRes = ( Math.random() < .5);
+			
+			lPool.push( lRes);
+			
+			while ( lPool.length > pPoolLenMax) lPool.shift();
+			
+			return lRes;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * probabilité contrôlée : on force un résultat de tirage de probabilité dans son pool
+	 * @param	pId			identifiant de probabilité contrôlée
+	 * @param	pIsProba	valeur de proba forcée
+	 */
+	public static function forceProbaId( pId : String, pIsProba : Bool) : Void {
+		if ( PROBA_POOLS == null) PROBA_POOLS = new Map<String,Array<Bool>>();
+		
+		if ( ! PROBA_POOLS.exists( pId)) PROBA_POOLS.set( pId, new Array<Bool>());
+		
+		PROBA_POOLS.get( pId).push( pIsProba);
+	}
+	
+	/**
+	 * on réinitialise un pool de probabilité contrôlée
+	 * @param	pId	identifiant de pool
+	 */
+	public static function freeProbaId( pId : String) : Void { if ( PROBA_POOLS != null && PROBA_POOLS.exists( pId)) PROBA_POOLS.remove( pId); }
 	
 	/**
 	 * on calcule l'angle médian d'un secteur d'angle

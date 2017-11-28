@@ -1,8 +1,8 @@
 package vega.effect.diskbounce;
 import haxe.io.Error;
-import pixi.core.math.Point;
 import pixi.core.math.shapes.Circle;
 import pixi.core.math.shapes.Rectangle;
+import vega.utils.PointXY;
 import vega.utils.Utils;
 import vega.utils.UtilsPixi;
 
@@ -35,12 +35,12 @@ class MyDiskBounce {
 	public var isFixed								: Bool										= false;
 	public var isGlobalBounce						: Bool										= false;
 	
-	var bPairs										: Array<Point>								= [];
+	var bPairs										: Array<PointXY>							= [];
 	var isPairsValid								: Bool										= true;
-	var bStack										: Point										= null;
+	var bStack										: PointXY									= null;
 	
 	public function new() {
-		bStack = new Point();
+		bStack = new PointXY();
 	}
 	
 	public function clone() : MyDiskBounce {
@@ -565,7 +565,7 @@ class MyDiskBounce {
 	
 	public function flush() : Void {
 		bPairs			= [];
-		bStack			= new Point();
+		bStack			= new PointXY();
 		isPairsValid	= true;
 	}
 	
@@ -657,7 +657,7 @@ class MyDiskBounce {
 				// aucune intersection
 				if ( pModARight < bPairs[ lI].y){
 					// insertion, nouvelle paire à gauche de lI
-					bPairs.insert( lI, new Point( pModALeft, pModARight));
+					bPairs.insert( lI, new PointXY( pModALeft, pModARight));
 					return;
 				}
 			}
@@ -666,7 +666,7 @@ class MyDiskBounce {
 		}
 		
 		// nouvelle paire à droite des autres
-		bPairs.push( new Point( pModALeft, pModARight));
+		bPairs.push( new PointXY( pModALeft, pModARight));
 	}
 	
 	function addBStack( pDX : Float, pDY : Float) : Void {
@@ -716,10 +716,10 @@ class MyDiskBounce {
 		}
 	}
 	
-	function extrapolateLongestPair() : Point {
-		var lRes		: Point	= new Point( bPairs[ 0].x, bPairs[ bPairs.length - 1].y);
-		var lFreeLen	: Float	= Utils.modA( lRes.x - lRes.y);
-		var lI			: Int	= 1;
+	function extrapolateLongestPair() : PointXY {
+		var lRes		: PointXY	= new PointXY( bPairs[ 0].x, bPairs[ bPairs.length - 1].y);
+		var lFreeLen	: Float		= Utils.modA( lRes.x - lRes.y);
+		var lI			: Int		= 1;
 		var lTmp		: Float;
 		
 		while ( lI < bPairs.length){
@@ -739,7 +739,7 @@ class MyDiskBounce {
 	}
 	
 	function doPairBounce() : Void {
-		var lPair	: Point		= extrapolateLongestPair();
+		var lPair	: PointXY	= extrapolateLongestPair();
 		var lDiff	: Float		= Utils.modA( lPair.y - lPair.x);
 		var lA		: Float		= Utils.midA( lPair.x, lPair.y);
 		var lCos	: Float		= -Math.cos( lA);

@@ -2,8 +2,8 @@ package vega.effect.skew;
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
 import pixi.core.math.Matrix;
-import pixi.core.math.Point;
 import pixi.flump.Movie;
+import vega.utils.PointXY;
 
 /**
  * déformation d'un clip avec effet de cisaillement : 3d homothétique
@@ -80,7 +80,7 @@ class MySkewMgr {
 	 * on effectue le cisaillement
 	 * @param	pToCenter	coordonnées du nouveau point de fuite dans le 
 	 */
-	public function doSkew( pToCenter : Point) : Void {
+	public function doSkew( pToCenter : PointXY) : Void {
 		var lScalarX	: Float		= motifCos * pToCenter.x + motifSin * pToCenter.y;
 		var lScalarY	: Float		= motifCos * pToCenter.y - motifSin * pToCenter.x;
 		var lMtrx		: Matrix;

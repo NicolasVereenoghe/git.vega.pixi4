@@ -1,9 +1,9 @@
 package vega.sprites;
 import pixi.core.display.Container;
-import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import vega.display.DepthMgr;
 import vega.utils.PointIJ;
+import vega.utils.PointXY;
 import vega.utils.RectangleIJ;
 import vega.utils.Utils;
 
@@ -15,7 +15,7 @@ class GroundMgr {
 	var NB_CELLS_W									: Int												= -1;
 	var NB_CELLS_H									: Int												= -1;
 	
-	var COEF_P										: Point;
+	var COEF_P										: PointXY;
 	
 	var container									: Container;
 	
@@ -32,7 +32,7 @@ class GroundMgr {
 	var clipRectIn									: Int -> Int -> Int -> Int -> Void;
 	var clipRectOut									: Int -> Int -> Int -> Int -> RectangleIJ -> Void;
 	
-	public var addSpriteCell						: Float -> Float -> Float -> RectangleIJ -> String -> Class<MySprite> -> String -> Point -> Bool -> Float -> MyCell;
+	public var addSpriteCell						: Float -> Float -> Float -> RectangleIJ -> String -> Class<MySprite> -> String -> PointXY -> Bool -> Float -> MyCell;
 	public var remSpriteCell						: MyCell -> Void;
 	
 	public var getSpriteCell						: MyCell -> PointIJ -> Array<MySprite>;
@@ -61,7 +61,7 @@ class GroundMgr {
 		
 		buildContainer( pContainer);
 		
-		COEF_P		= new Point( _lvlGround.getCOEF_PARALLAXE().x - 1, _lvlGround.getCOEF_PARALLAXE().y - 1);
+		COEF_P		= new PointXY( _lvlGround.getCOEF_PARALLAXE().x - 1, _lvlGround.getCOEF_PARALLAXE().y - 1);
 		
 		sprites		= new Map<String,MySprite>();
 		
@@ -311,7 +311,7 @@ class GroundMgr {
 		return lRes;
 	}
 	
-	function addSpriteCellRegular( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
+	function addSpriteCellRegular( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : PointXY = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
 		var lCell			: MyCell		= _lvlGround.createCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale, false, pRot);
 		var lCellClipRIJ	: RectangleIJ	= lCell.getCellOffset().clone();
 		var lClipRIJ		: RectangleIJ	= new RectangleIJ( curI, curJ, NB_CELLS_W - 1, NB_CELLS_H - 1);
@@ -333,7 +333,7 @@ class GroundMgr {
 		return lCell;
 	}
 	
-	function addSpriteCellCycle( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
+	function addSpriteCellCycle( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : PointXY = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
 		var lCell			: MyCell		= _lvlGround.createCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale, false, pRot);
 		var lOffsets		: RectangleIJ	= getCellCameraOffsets( lCell);
 		var lGroundOffset	: PointIJ;

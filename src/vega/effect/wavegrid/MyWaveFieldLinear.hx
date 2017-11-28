@@ -1,5 +1,5 @@
 package vega.effect.wavegrid;
-import pixi.core.math.Point;
+import vega.utils.PointXY;
 
 /**
  * champ linéaire de vagues
@@ -59,7 +59,7 @@ class MyWaveFieldLinear extends MyWaveField {
 	 * @param	pX		abscisse dans le champ
 	 * @param	pY		ordonnée dans le champ
 	 */
-	function doUpdateAppear( pVect : Point, pX : Float, pY : Float) : Void {
+	function doUpdateAppear( pVect : PointXY, pX : Float, pY : Float) : Void {
 		var lDist	: Float	= ( pX - sourceX) * cos + ( pY - sourceY) * sin;
 		var lWave	: Float	= coefGlobal * Math.sin( 2 * Math.PI * ( curWaveStep + lDist) / PERIOD) * ( ctrState / DELAY_FADE);
 		
@@ -94,7 +94,7 @@ class MyWaveFieldLinear extends MyWaveField {
 	 * @param	pX		abscisse dans le champ
 	 * @param	pY		ordonnée dans le champ
 	 */
-	function doUpdateRun( pVect : Point, pX : Float, pY : Float) : Void {
+	function doUpdateRun( pVect : PointXY, pX : Float, pY : Float) : Void {
 		var lDist	: Float	= ( pX - sourceX) * cos + ( pY - sourceY) * sin;
 		var lWave	: Float	= coefGlobal * Math.sin( 2 * Math.PI * ( curWaveStep + lDist) / PERIOD);
 		
@@ -134,7 +134,7 @@ class MyWaveFieldLinear extends MyWaveField {
 	 * @param	pX		abscisse dans le champ
 	 * @param	pY		ordonnée dans le champ
 	 */
-	function doUpdateDisappear( pVect : Point, pX : Float, pY : Float) : Void {
+	function doUpdateDisappear( pVect : PointXY, pX : Float, pY : Float) : Void {
 		var lDist	: Float	= ( pX - sourceX) * cos + ( pY - sourceY) * sin;
 		var lWave	: Float	= coefGlobal * Math.sin( 2 * Math.PI * ( curWaveStep + lDist) / PERIOD) * ( 1 - ctrState / DELAY_FADE);
 		

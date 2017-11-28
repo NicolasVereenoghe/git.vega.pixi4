@@ -1,7 +1,8 @@
 package vega.sprites;
-import pixi.core.math.Point;
+
 import vega.sprites.MyCell;
 import vega.sprites.MySpriteMgr;
+import vega.utils.PointXY;
 
 /**
  * un mobile physique
@@ -12,7 +13,7 @@ class MySpMobile extends MySpFrame {
 	/** norme de gravité */
 	var _GRAV									: Float							= 10;
 	/** vecteur de gravité */
-	var GRAV( get, null)						: Point;
+	var GRAV( get, null)						: PointXY;
 	/** masse du mobile */
 	var MASSE									: Float							= 1;
 	/** facteur de friction */
@@ -23,7 +24,7 @@ class MySpMobile extends MySpFrame {
 	var SPEED_BOUNCE_REFLECT_COEF				: Float							= 0;
 	
 	/** vitesse */
-	var speed									: Point							= null;
+	var speed									: PointXY						= null;
 	/** accumulation de forces en x */
 	var accFX									: Float							= 0;
 	/** accumulation de forces en y */
@@ -47,13 +48,13 @@ class MySpMobile extends MySpFrame {
 	 * calcul de vecteur gravité
 	 * @return	vecteur gravité
 	 */
-	function get_GRAV() : Point { return new Point( 0, _GRAV); }
+	function get_GRAV() : PointXY { return new PointXY( 0, _GRAV); }
 	
 	/**
 	 * initisation des propriétés physiques du mobile
 	 */
 	function initMobile() : Void {
-		speed	= new Point( 0, 0);
+		speed	= new PointXY( 0, 0);
 	}
 	
 	/**

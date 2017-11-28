@@ -1,6 +1,7 @@
 package vega.camera;
-import pixi.core.math.Point;
+
 import pixi.core.math.shapes.Rectangle;
+import vega.utils.PointXY;
 
 /**
  * ...
@@ -75,7 +76,7 @@ class MyCamera {
 	 * on effectue un saut sans inertie de la caméra vers le nouveau point de vue
 	 * @param	pView	point de vue dans repère caméra, visé par rapport au centre de caméra ; réf temporisée et modifiée en interne si on tappe une limite
 	 */
-	public function jumpTo( pView : Point) : Void {
+	public function jumpTo( pView : PointXY) : Void {
 		inertiaLeft		= MAX_INERTIA_X;
 		inertiaRight	= MAX_INERTIA_X;
 		inertiaTop		= MAX_INERTIA_Y;
@@ -92,7 +93,7 @@ class MyCamera {
 	 * @param	pView		point de vue dans repère caméra, visé par rapport au centre de caméra ; réf temporisée et modifiée en interne si on tappe une limite
 	 * @param	pZoomScale	forcer un scale de zoom sur la caméra ; laisser -1 pour garder celui en cours
 	 */
-	public function slideTo( pView : Point, pZoomScale : Float = -1) : Void {
+	public function slideTo( pView : PointXY, pZoomScale : Float = -1) : Void {
 		var lDeltX	: Float	= pView.x - _x;
 		var lDeltY	: Float	= pView.y - _y;
 		var lRate	: Float;

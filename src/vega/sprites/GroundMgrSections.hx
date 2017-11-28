@@ -1,7 +1,6 @@
 package vega.sprites;
 
 import pixi.core.display.Container;
-import pixi.core.math.Point;
 import vega.sprites.MySprite;
 import vega.utils.PointIJ;
 import vega.utils.RectangleIJ;

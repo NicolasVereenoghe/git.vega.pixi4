@@ -1,5 +1,5 @@
 package vega.effect.wavegrid;
-import pixi.core.math.Point;
+import vega.utils.PointXY;
 
 /**
  * champ radial de vagues
@@ -51,7 +51,7 @@ class MyWaveFieldRadial extends MyWaveField {
 	 * @param	pX		abscisse dans le champ
 	 * @param	pY		ordonnée dans le champ
 	 */
-	function doUpdateAppear( pVect : Point, pX : Float, pY : Float) : Void {
+	function doUpdateAppear( pVect : PointXY, pX : Float, pY : Float) : Void {
 		var lDX		: Float	= pX - sourceX;
 		var lDY		: Float	= pY - sourceY;
 		var lDist	: Float	= lDX * lDX + lDY * lDY;
@@ -100,7 +100,7 @@ class MyWaveFieldRadial extends MyWaveField {
 	 * @param	pX		abscisse dans le champ
 	 * @param	pY		ordonnée dans le champ
 	 */
-	function doUpdateRun( pVect : Point, pX : Float, pY : Float) : Void {
+	function doUpdateRun( pVect : PointXY, pX : Float, pY : Float) : Void {
 		var lDX		: Float	= pX - sourceX;
 		var lDY		: Float	= pY - sourceY;
 		var lDist	: Float	= lDX * lDX + lDY * lDY;
@@ -152,7 +152,7 @@ class MyWaveFieldRadial extends MyWaveField {
 	 * @param	pX		abscisse dans le champ
 	 * @param	pY		ordonnée dans le champ
 	 */
-	function doUpdateDisappear( pVect : Point, pX : Float, pY : Float) : Void {
+	function doUpdateDisappear( pVect : PointXY, pX : Float, pY : Float) : Void {
 		var lDX		: Float	= pX - sourceX;
 		var lDY		: Float	= pY - sourceY;
 		var lDist	: Float	= lDX * lDX + lDY * lDY;

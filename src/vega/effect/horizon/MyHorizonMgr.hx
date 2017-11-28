@@ -1,9 +1,9 @@
 package vega.effect.horizon;
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
-import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import pixi.flump.Movie;
+import vega.utils.PointXY;
 import vega.utils.UtilsFlump;
 import vega.utils.UtilsPixi;
 
@@ -161,7 +161,7 @@ class MyHorizonMgr {
 	 * @param	pYRate	taux d'influence du bump y sur le point de fuite
 	 * @return coord de point de fuite dans repère d'horizon
 	 */
-	public function getVanish( pXRate : Float = 1, pYRate : Float = 1) : Point { return new Point( pXRate * bumpX, _vanishY + pYRate * bumpY); }
+	public function getVanish( pXRate : Float = 1, pYRate : Float = 1) : PointXY { return new PointXY( pXRate * bumpX, _vanishY + pYRate * bumpY); }
 	
 	/**
 	 * on récupère la largeur du motif

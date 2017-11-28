@@ -1,7 +1,7 @@
 package vega.sprites;
 
-import pixi.core.math.Point;
 import vega.sprites.MySprite;
+import vega.utils.PointXY;
 
 /**
  * sprite de mur simple
@@ -12,5 +12,5 @@ class MySpWall extends MySprite {
 	public function new() { super(); }
 	
 	/** @inheritDoc */
-	override public function doBounce( pSp : MySprite, pXY : Point = null, pIsFeet : Bool = true) : Bool { return getHitRect().contains( pXY.x, pXY.y); }
+	override public function doBounce( pSp : MySprite, pXY : PointXY = null, pIsFeet : Bool = true) : Bool { return getHitRect().contains( pXY.x, pXY.y); }
 }

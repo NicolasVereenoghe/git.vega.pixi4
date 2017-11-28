@@ -6,7 +6,6 @@ import js.FullScreenApi;
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
 import pixi.core.graphics.Graphics;
-import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import pixi.core.textures.Texture;
 import pixi.flump.Movie;
@@ -49,15 +48,16 @@ class UtilsFlump {
 	 * @param	pXY		coordonnées dans repère du movie conteneur
 	 * @return	true si collision, false sinon
 	 */
-	public static function testHitMultiBox( pCont : Movie, pXY : Point) : Bool {
+	public static function testHitMultiBox( pCont : Movie, pXY : PointXY) : Bool {
 		var lLayers	: Array<Layer>	= getLayers( pCont);
-		var lLayer	: Layer;
-		var lCoord	: Point;
+		var lCoord	: PointXY;
 		var lBox	: Container;
 		
-		for ( lLayer in lLayers){
-			lBox	= pCont.getLayer( lLayer.name);
-			lCoord	= lBox.toLocal( pXY, pCont);
+		for ( iLayer in lLayers){
+			lBox	= pCont.getLayer( iLayer.name);
+			lCoord	= new PointXY();
+			
+			lBox.toLocal( cast pXY, pCont, cast lCoord);
 			
 			if ( lBox.getLocalBounds().contains( lCoord.x, lCoord.y)) return true;
 		}
@@ -325,7 +325,9 @@ class UtilsFlump {
 	
 	public static function updateLayerInstanceRelativePos( pCont : Container, pX : Float, pY : Float) : Void {
 		var lDisp	: DisplayObject	= pCont.getChildAt( 0);
-		var lCoord	: Point			= pCont.toLocal( new Point( pX, pY), pCont.parent);
+		var lCoord	: PointXY		= cast new PointXY();
+		
+		pCont.toLocal( cast new PointXY( pX, pY), pCont.parent, cast lCoord);
 		
 		lDisp.x	= lCoord.x;
 		lDisp.y	= lCoord.y;
@@ -376,10 +378,10 @@ class UtilsFlump {
 	 * @param	pLayer	instance de layer de Movie
 	 * @return	xy virtuel composite (conteneur + contenant)
 	 */
-	public static function getLayerXY( pLayer : Container) : Point {
+	public static function getLayerXY( pLayer : Container) : PointXY {
 		var lChild	: DisplayObject	= pLayer.getChildAt( 0);
 		
-		return new Point( lChild.x * pLayer.scale.x + pLayer.x, lChild.y * pLayer.scale.y + pLayer.y);
+		return new PointXY( lChild.x * pLayer.scale.x + pLayer.x, lChild.y * pLayer.scale.y + pLayer.y);
 	}
 	
 	/**

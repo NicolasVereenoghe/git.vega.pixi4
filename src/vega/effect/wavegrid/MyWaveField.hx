@@ -1,5 +1,5 @@
 package vega.effect.wavegrid;
-import pixi.core.math.Point;
+import vega.utils.PointXY;
 
 /**
  * descripteur de champ de vagues
@@ -22,7 +22,7 @@ class MyWaveField {
 	/** mode d'itération */
 	var doMode						: Float -> Bool;
 	/** méthode de calcul d'effet de vague */
-	var doUpdate					: Point -> Float -> Float -> Void;
+	var doUpdate					: PointXY -> Float -> Float -> Void;
 	
 	/** abscisse source du signal */
 	var sourceX							: Float;
@@ -64,7 +64,7 @@ class MyWaveField {
 	 * @param	pX		abscisse dans le champ
 	 * @param	pY		ordonnée dans le champ
 	 */
-	public function updateVectAt( pVect : Point, pX : Float, pY : Float) : Void {
+	public function updateVectAt( pVect : PointXY, pX : Float, pY : Float) : Void {
 		if ( doUpdate != null) doUpdate( pVect, pX, pY);
 	}
 	

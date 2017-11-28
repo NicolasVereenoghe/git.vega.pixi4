@@ -1,6 +1,7 @@
 package vega.effect.cloudbounce;
-import pixi.core.math.Point;
+
 import pixi.flump.Movie;
+import vega.utils.PointXY;
 
 /**
  * collisions par nuage de points ; ne gère pas le skew/scale
@@ -9,16 +10,16 @@ import pixi.flump.Movie;
 class MyCloudBounce {
 	var BOUNCE_QUOTIENT							: Float										= 10;
 	
-	var points									: Array<Point>								= null;
-	var gravity									: Point										= null;
+	var points									: Array<PointXY>							= null;
+	var gravity									: PointXY									= null;
 	var bTab									: Array<Array<MyBounceData>>				= null;
 	
 	var testOneBounce							: Float->Float->Int->Bool					= null;
 	
 	var notifyPreBounce							: Float->Float->Void						= null;
 	
-	var curPos									: Point										= null;
-	var curSpeed								: Point										= null;
+	var curPos									: PointXY									= null;
+	var curSpeed								: PointXY									= null;
 	
 	var bounceIBeg								: Int										= -1;
 	var bounceIEnd								: Int										= -1;
@@ -34,21 +35,21 @@ class MyCloudBounce {
 		// TODO !!
 	}
 	
-	public function initFromDisk( pRay : Float, pNbPt : Int, pOffsetA : Float = 0, pOffsetPt : Point = null) : Void {
+	public function initFromDisk( pRay : Float, pNbPt : Int, pOffsetA : Float = 0, pOffsetPt : PointXY = null) : Void {
 		var lDA	: Float	= 2 * Math.PI / pNbPt;
 		var lI	: Int;
 		var lA	: Float;
 		
-		points	= new Array<Point>();
+		points	= new Array<PointXY>();
 		
 		if ( pOffsetPt != null) gravity = pOffsetPt;
-		else gravity = new Point();
+		else gravity = new PointXY();
 		
 		lI = 0;
 		while ( lI < pNbPt){
 			lA = pOffsetA + lDA * lI;
 			
-			points.push( new Point( pRay * Math.cos( lA) + gravity.x, pRay * Math.sin( lA) + gravity.y));
+			points.push( new PointXY( pRay * Math.cos( lA) + gravity.x, pRay * Math.sin( lA) + gravity.y));
 			
 			lI++;
 		}
@@ -65,7 +66,7 @@ class MyCloudBounce {
 		gravity			= null;
 	}
 	
-	public function doBounce( pPos : Point, pSpeed : Point) : Bool {
+	public function doBounce( pPos : PointXY, pSpeed : PointXY) : Bool {
 		curPos		= pPos;
 		curSpeed	= pSpeed;
 		
@@ -142,7 +143,7 @@ class MyCloudBounce {
 	
 	function resolveBounce() : Void {
 		var lBounce		: MyBounceData	= bTab[ bounceIBeg][ bounceIEnd];
-		var lVect1		: Point			= new Point( lBounce.x, lBounce.y);
+		var lVect1		: PointXY		= new PointXY( lBounce.x, lBounce.y);
 		var lX			: Float			= curSpeed.x;
 		var lY			: Float			= curSpeed.y;
 		
@@ -209,7 +210,7 @@ class MyCloudBounce {
 		var lNbPt		: Int						= points.length;
 		var lInd		: Int						= ( pIndB + 1) % lNbPt;
 		var lMax		: Float						= 0;
-		var lPt			: Point;
+		var lPt			: PointXY;
 		var lX			: Float;
 		var lY			: Float;
 		var lDist		: Float;

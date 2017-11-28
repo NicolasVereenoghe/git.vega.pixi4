@@ -1,7 +1,6 @@
 package vega.utils;
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
-import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import pixi.interaction.InteractionEvent;
 import vega.assets.AssetInstance;
@@ -21,8 +20,11 @@ class UtilsPixi {
 	 */
 	public static function toLocalRect( pDisp : DisplayObject, pToLocalCont : DisplayObject) : Rectangle {
 		var lRect	: Rectangle	= pDisp.getLocalBounds();
-		var lTL		: Point		= pToLocalCont.toLocal( new Point( lRect.x, lRect.y), pDisp);
-		var lBR		: Point		= pToLocalCont.toLocal( new Point( lRect.x + lRect.width, lRect.y + lRect.height), pDisp);
+		var lTL		: PointXY	= new PointXY();
+		var lBR		: PointXY	= new PointXY();
+		
+		pToLocalCont.toLocal( cast new PointXY( lRect.x, lRect.y), pDisp, cast lTL);
+		pToLocalCont.toLocal( cast new PointXY( lRect.x + lRect.width, lRect.y + lRect.height), pDisp, cast lBR);
 		
 		lRect.x			= Math.min( lTL.x, lBR.x);
 		lRect.y			= Math.min( lTL.y, lBR.y);
@@ -97,8 +99,8 @@ class UtilsPixi {
 	 * @param	pCoord	coordonées dans repère du contenu à transformer ; l'instance même est modifiée
 	 * @return	coordonées transformées dans repère du petit fils
 	 */
-	public static function contentToChild( pChild : DisplayObject, pCoord : Point) : Point {
-		var lTrans	: Array<Array<Point>>	= new Array<Array<Point>>();
+	public static function contentToChild( pChild : DisplayObject, pCoord : PointXY) : PointXY {
+		var lTrans	: Array<Array<PointXY>>	= new Array<Array<PointXY>>();
 		var lTarget	: Container				= ApplicationMatchSize.instance.getContent();
 		var lI		: Int;
 		var lX		: Float;
@@ -106,10 +108,10 @@ class UtilsPixi {
 		
 		while ( pChild != lTarget) {
 			//lTrans.push( [ new Point( pChild.x, pChild.y), pChild.scale.clone()]); // clone ne passe plus en pixi 4 ???
-			lTrans.push( [ new Point( pChild.x, pChild.y), new Point( pChild.scale.x, pChild.scale.y)]);
+			lTrans.push( [ new PointXY( pChild.x, pChild.y), new PointXY( pChild.scale.x, pChild.scale.y)]);
 			
 			if ( pChild.rotation != 0){
-				lTrans[ lTrans.length - 1].push( new Point( Math.cos( pChild.rotation), Math.sin( pChild.rotation)));
+				lTrans[ lTrans.length - 1].push( new PointXY( Math.cos( pChild.rotation), Math.sin( pChild.rotation)));
 			}
 			
 			pChild = pChild.parent;
@@ -134,7 +136,7 @@ class UtilsPixi {
 		return pCoord;
 	}
 	
-	public static function childToContent( pChild : DisplayObject, pCoord : Point) : Point {
+	public static function childToContent( pChild : DisplayObject, pCoord : PointXY) : PointXY {
 		var lTarget	: Container	= ApplicationMatchSize.instance.getContent();
 		var lCos	: Float;
 		var lSin	: Float;
@@ -161,7 +163,7 @@ class UtilsPixi {
 		return pCoord;
 	}
 	
-	public static function childToChild( pFrom : DisplayObject, pTo : DisplayObject, pCoord : Point) : Point { return contentToChild( pTo, childToContent( pFrom, pCoord)); }
+	public static function childToChild( pFrom : DisplayObject, pTo : DisplayObject, pCoord : PointXY) : PointXY { return contentToChild( pTo, childToContent( pFrom, pCoord)); }
 	
 	/**
 	 * addition de vecteurs ; pas d'instance créée, on utilise le point A
@@ -169,7 +171,7 @@ class UtilsPixi {
 	 * @param	pPtB	vecteur B
 	 * @return	vecteur A ajouté de B
 	 */
-	public static function addPt( pPtA : Point, pPtB : Point) : Point {
+	public static function addPt( pPtA : PointXY, pPtB : PointXY) : PointXY {
 		pPtA.x	+= pPtB.x;
 		pPtA.y	+= pPtB.y;
 		
@@ -182,7 +184,7 @@ class UtilsPixi {
 	 * @param	pPtB	vecteur B
 	 * @return	nouveau vecteur différence
 	 */
-	public static function subPt( pPtA : Point, pPtB : Point) : Point { return new Point( pPtA.x - pPtB.x, pPtA.y - pPtB.y); }
+	public static function subPt( pPtA : PointXY, pPtB : PointXY) : PointXY { return new PointXY( pPtA.x - pPtB.x, pPtA.y - pPtB.y); }
 	
 	/**
 	 * on teste si 2 rectangle se touchent

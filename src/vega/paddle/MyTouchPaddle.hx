@@ -1,12 +1,12 @@
 package vega.paddle;
 
 import pixi.core.display.DisplayObject;
-import pixi.core.math.Point;
 import pixi.interaction.InteractionEvent;
 import pixi.interaction.InteractionData;
 import vega.paddle.MyTouchPaddle.TouchDesc;
 import vega.shell.ApplicationMatchSize;
 import vega.utils.PointIJ;
+import vega.utils.PointXY;
 
 /**
  * paddle directionnel controlé au slide sur écran
@@ -60,7 +60,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 	var locks						: PointIJ;
 	
 	/** compteurs de neutralité des axes horizontaux (x) et verticaux (y), en ms */
-	var neutralsDT					: Point;
+	var neutralsDT					: PointXY;
 	/** directions d'axes neutralisées, i pour direction horizontal et j pour verticales */
 	var neutrals					: PointIJ;
 	
@@ -75,7 +75,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 		curDir		= new PointIJ();
 		locks		= new PointIJ();
 		neutrals	= new PointIJ();
-		neutralsDT	= new Point();
+		neutralsDT	= new PointXY();
 		
 		lAnchor.on( "mousedown", onMouseDown);
 		lAnchor.on( "mouseup", onMouseUp);
@@ -93,7 +93,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 	public function doFrame( pDT : Float) : Void {
 		var lILock	: Bool			= false;
 		var lJLock	: Bool			= false;
-		var lDelt	: Point;
+		var lDelt	: PointXY;
 		var lCoef	: Float;
 		var lDir	: TouchDirTime;
 		var lI		: Int;
@@ -110,7 +110,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 				anchor.coord.x	= lCoef * anchor.coord.x + ( 1 - lCoef) * ( data.coord.x * ANCHOR_INERTIA_DT) / ANCHOR_INERTIA_DT;
 				anchor.coord.y	= lCoef * anchor.coord.y + ( 1 - lCoef) * ( data.coord.y * ANCHOR_INERTIA_DT) / ANCHOR_INERTIA_DT;
 				
-				lDelt			= new Point( data.coord.x - anchor.coord.x, data.coord.y - anchor.coord.y);
+				lDelt			= new PointXY( data.coord.x - anchor.coord.x, data.coord.y - anchor.coord.y);
 				
 				if ( locks.i > 0){
 					if ( lDelt.x > 0){
@@ -161,7 +161,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 						if ( lDelt != null){
 							lDelt.x += dirs[ lI].dir.x;
 							lDelt.y += dirs[ lI].dir.y;
-						}else lDelt = new Point( dirs[ lI].dir.x, dirs[ lI].dir.y);
+						}else lDelt = new PointXY( dirs[ lI].dir.x, dirs[ lI].dir.y);
 					}
 					
 					if ( lCtrT >= STACK_TOUCH_TIME){
@@ -438,7 +438,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 	}
 	
 	function onTouchDown( pE : InteractionEvent) : Void {
-		var lData	: TouchDesc	= new TouchDesc( Std.string( pE.data.identifier), pE.data.getLocalPosition( getRepere()));
+		var lData	: TouchDesc	= new TouchDesc( Std.string( pE.data.identifier), pE.data.getLocalPosition( getRepere(), cast new PointXY()));
 		
 		if ( data != null && data.id != lData.id && data.id != TOUCH_MOUSE_ID){
 			remDatas( lData.id);
@@ -465,7 +465,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 	
 	function onTouchMove( pE : InteractionEvent) : Void {
 		var lId		: String	= Std.string( pE.data.identifier);
-		var lCoord	: Point		= pE.data.getLocalPosition( getRepere());
+		var lCoord	: PointXY	= pE.data.getLocalPosition( getRepere(), cast new PointXY());
 		var lData	: TouchDesc;
 		
 		if ( data != null && data.id != TOUCH_MOUSE_ID){
@@ -482,7 +482,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 	
 	function onMouseDown( pE : InteractionEvent) : Void {
 		if( datas.length > 0) datas = [];
-		data = new TouchDesc( TOUCH_MOUSE_ID, pE.data.getLocalPosition( getRepere()));
+		data = new TouchDesc( TOUCH_MOUSE_ID, pE.data.getLocalPosition( getRepere(), cast new PointXY()));
 		
 	}
 	
@@ -495,7 +495,7 @@ class MyTouchPaddle implements IDirectionPaddle {
 		if( datas.length > 0) datas = [];
 		
 		if ( data != null && data.id == TOUCH_MOUSE_ID){
-			data.coord = pE.data.getLocalPosition( getRepere());
+			data.coord = pE.data.getLocalPosition( getRepere(), cast new PointXY());
 		}else{
 			data = null;
 		}
@@ -509,9 +509,9 @@ class TouchDesc {
 	/** identifiant de touche */
 	public var id			: String;
 	/** coordonnées de touche */
-	public var coord		: Point;
+	public var coord		: PointXY;
 	
-	public function new( pId : String, pCoord : Point) {
+	public function new( pId : String, pCoord : PointXY) {
 		id		= pId;
 		coord	= pCoord;
 	}
@@ -526,9 +526,9 @@ class TouchDirTime {
 	/** écart de temps en ms lors de la prise de cette direction de touche */
 	public var dt			: Float;
 	/** direction de touche */
-	public var dir			: Point;
+	public var dir			: PointXY;
 	
-	public function new( pDt : Float, pDir : Point) {
+	public function new( pDt : Float, pDir : PointXY) {
 		dt	= pDt;
 		dir	= pDir;
 	}

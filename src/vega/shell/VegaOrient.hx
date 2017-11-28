@@ -2,7 +2,6 @@ package vega.shell;
 import js.Browser;
 import js.html.DeviceMotionEvent;
 import js.html.DeviceOrientationEvent;
-import pixi.core.math.Point;
 
 /**
  * ...

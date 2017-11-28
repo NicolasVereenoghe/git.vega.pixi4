@@ -1,8 +1,8 @@
 package vega.sprites;
 
-import pixi.core.math.Point;
 import vega.sprites.MySpFrame;
 import vega.utils.PointIJ;
+import vega.utils.PointXY;
 
 /**
  * sprite personnage de plate forme 2d, avec collision gauche doite pieds et tête
@@ -37,10 +37,10 @@ class MySpMember extends MySpFrame {
 	
 	/** @inheritDoc */
 	override function seekBounce() : Void {
-		var lRight	: Array<Point>	= getHitRight();
-		var lLeft	: Array<Point>	= getHitLeft();
-		var lHead	: Array<Point>	= getHitHead();
-		var lFeet	: Array<Point>	= getHitFeet();
+		var lRight	: Array<PointXY>	= getHitRight();
+		var lLeft	: Array<PointXY>	= getHitLeft();
+		var lHead	: Array<PointXY>	= getHitHead();
+		var lFeet	: Array<PointXY>	= getHitFeet();
 		
 		if ( testBounce( lRight, false)){
 			if ( testBounce( lLeft, false)){
@@ -96,11 +96,9 @@ class MySpMember extends MySpFrame {
 	 * @param	pFilter	méthode filtre qui teste l'instance et renvoie true si l'instance peut être utilisée pour la collision ; laisser null pour aucun filtre
 	 * @return	true si collision, false sinon
 	 */
-	function testBounce( pPts : Array<Point>, pIsFeet : Bool, pDX : Float = 0, pDY : Float = 0, pFilter : MySprite -> Bool = null) : Bool {
-		var lPt	: Point;
-		
-		for ( lPt in pPts){
-			if ( testOneBounce( lPt, pIsFeet, pDX, pDY, pFilter)) return true;
+	function testBounce( pPts : Array<PointXY>, pIsFeet : Bool, pDX : Float = 0, pDY : Float = 0, pFilter : MySprite -> Bool = null) : Bool {
+		for ( iPt in pPts){
+			if ( testOneBounce( iPt, pIsFeet, pDX, pDY, pFilter)) return true;
 		}
 		
 		return false;
@@ -115,9 +113,9 @@ class MySpMember extends MySpFrame {
 	 * @param	pFilter	méthode filtre qui teste l'instance et renvoie true si l'instance peut être utilisée pour la collision ; laisser null pour aucun filtre
 	 * @return	true si collision, false sinon
 	 */
-	function testOneBounce( pPt : Point, pIsFeet : Bool, pDX : Float = 0, pDY : Float = 0, pFilter : MySprite -> Bool = null) : Bool {
+	function testOneBounce( pPt : PointXY, pIsFeet : Bool, pDX : Float = 0, pDY : Float = 0, pFilter : MySprite -> Bool = null) : Bool {
 		var lLvl	: LvlGroundMgr			= getBounceLvlGround();
-		var lCoordR	: Point					= new Point( x + pPt.x + pDX, y + pPt.y + pDY);
+		var lCoordR	: PointXY				= new PointXY( x + pPt.x + pDX, y + pPt.y + pDY);
 		var lIJ		: PointIJ				= new PointIJ( lLvl.x2i( lCoordR.x), lLvl.y2j( lCoordR.y));
 		var lCells	: Map<String,MyCell>	= lLvl.getCellsAt( lLvl.x2ModI( lCoordR.x), lLvl.y2ModJ( lCoordR.y));
 		var lCell	: MyCell;
@@ -143,25 +141,25 @@ class MySpMember extends MySpFrame {
 	 * récupère une liste de points de contacts à droite
 	 * @return	liste de coordonnées, delta de position x y du sprite
 	 */
-	function getHitRight() : Array<Point> { return null; }
+	function getHitRight() : Array<PointXY> { return null; }
 	
 	/**
 	 * récupère une liste de points de contacts à gauche
 	 * @return	liste de coordonnées, delta de position x y du sprite
 	 */
-	function getHitLeft() : Array<Point> { return null; }
+	function getHitLeft() : Array<PointXY> { return null; }
 	
 	/**
 	 * récupère une liste de points de contacts de la tête
 	 * @return	liste de coordonnées, delta de position x y du sprite
 	 */
-	function getHitHead() : Array<Point> { return null; }
+	function getHitHead() : Array<PointXY> { return null; }
 	
 	/**
 	 * récupère une liste de points de contacts des pieds
 	 * @return	liste de coordonnées, delta de position x y du sprite
 	 */
-	function getHitFeet() : Array<Point> { return null; }
+	function getHitFeet() : Array<PointXY> { return null; }
 	
 	/**
 	 * temporisation de chute d'une plateforme
@@ -194,8 +192,8 @@ class MySpMember extends MySpFrame {
 	 * résolution de collision depuis la tête
 	 */
 	function doBounceHead() : Void {
-		var lPts	: Array<Point>	= getHitHead();
-		var lCtr	: Int			= B_MAX;
+		var lPts	: Array<PointXY>	= getHitHead();
+		var lCtr	: Int				= B_MAX;
 		
 		if ( vY < 0) vY = 0;
 		
@@ -208,8 +206,8 @@ class MySpMember extends MySpFrame {
 	 * résolution de collision depuis les pieds
 	 */
 	function doBounceFeet() : Void {
-		var lPts	: Array<Point>	= getHitFeet();
-		var lCtr	: Int			= B_MAX;
+		var lPts	: Array<PointXY>	= getHitFeet();
+		var lCtr	: Int				= B_MAX;
 		
 		if( testBounce( lPts, true, 0, 0, filterFeet)){
 			if ( vY > 0) vY = 0;
@@ -226,8 +224,8 @@ class MySpMember extends MySpFrame {
 	 * résolution de collision depuis la droite
 	 */
 	function doBounceRight() : Void {
-		var lPts	: Array<Point>	= getHitRight();
-		var lCtr	: Int			= B_MAX;
+		var lPts	: Array<PointXY>	= getHitRight();
+		var lCtr	: Int				= B_MAX;
 		
 		if ( vX > 0) vX = 0;
 		
@@ -240,8 +238,8 @@ class MySpMember extends MySpFrame {
 	 * résolution de collision depuis la gauche
 	 */
 	function doBounceLeft() : Void {
-		var lPts	: Array<Point>	= getHitLeft();
-		var lCtr	: Int			= B_MAX;
+		var lPts	: Array<PointXY>	= getHitLeft();
+		var lCtr	: Int				= B_MAX;
 		
 		if ( vX < 0) vX = 0;
 		

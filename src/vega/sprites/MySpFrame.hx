@@ -1,10 +1,10 @@
 package vega.sprites;
 import pixi.core.display.DisplayObject.DestroyOptions;
-import pixi.core.math.Point;
 import vega.sprites.MyCell;
 import vega.sprites.MySpriteMgr;
 import vega.utils.PointIJ;
 import haxe.extern.EitherType;
+import vega.utils.PointXY;
 
 /**
  * sprite avec itération de frame
@@ -74,7 +74,7 @@ class MySpFrame extends MySprite {
 	 */
 	function seekEffect() : Void {
 		var lLvl	: LvlGroundMgr			= getEffectLvlGround();
-		var lXY		: Point					= getGrav();
+		var lXY		: PointXY				= getGrav();
 		var lIJ		: PointIJ				= new PointIJ( lLvl.x2i( x), lLvl.y2j( y));
 		var lCells	: Map<String,MyCell>	= lLvl.getCellsAt( lLvl.x2ModI( x), lLvl.y2ModJ( y));
 		var lSps	: Array<MySprite>;
@@ -99,13 +99,13 @@ class MySpFrame extends MySprite {
 	 * @param	pXY	notre coordonnée de test sur le voisin
 	 * @return	true si interaction résolue, false sinon
 	 */
-	function onEffect( pSp : MySprite, pXY : Point) : Bool { return pSp.doEffect( this, pXY); }
+	function onEffect( pSp : MySprite, pXY : PointXY) : Bool { return pSp.doEffect( this, pXY); }
 	
 	/**
 	 * on récupère la coordonnée de jeu qui représente le centre de gravité du sprite
 	 * @return	cenrte de gravité en coordonnée de jeu
 	 */
-	function getGrav() : Point { return new Point( x, y); }
+	function getGrav() : PointXY { return new PointXY( x, y); }
 	
 	/**
 	 * on recherche et résoud les collisions avec les voisins du plan

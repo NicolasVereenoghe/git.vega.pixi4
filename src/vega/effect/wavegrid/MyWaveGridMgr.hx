@@ -1,12 +1,12 @@
 package vega.effect.wavegrid;
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
-import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import pixi.flump.Movie;
 import vega.assets.AssetInstance;
 import vega.assets.AssetsMgr;
 import vega.shell.ApplicationMatchSize;
+import vega.utils.PointXY;
 import vega.utils.UtilsFlump;
 
 /**
@@ -122,7 +122,7 @@ class MyWaveGridMgr {
 		var lCol	: Map<Int,MyWaveCell>;
 		var lCell	: MyWaveCell;
 		var lWave	: MyWaveField;
-		var lVect	: Point;
+		var lVect	: PointXY;
 		var lX		: Float;
 		var lY		: Float;
 		var lI		: Int;
@@ -141,7 +141,7 @@ class MyWaveGridMgr {
 		
 		for ( lCol in cells){
 			for ( lCell in lCol){
-				lVect	= new Point();
+				lVect	= new PointXY();
 				lX		= lCell.getX();
 				lY		= lCell.getY();
 				
@@ -171,7 +171,7 @@ class MyWaveGridMgr {
 		var lX		: Float;
 		var lY		: Float;
 		var lWave	: MyWaveField;
-		var lVect	: Point;
+		var lVect	: PointXY;
 		
 		cells		= new Map<Int,Map<Int,MyWaveCell>>();
 		
@@ -196,7 +196,7 @@ class MyWaveGridMgr {
 				lCont.x		= lX;
 				lCont.y		= lY;
 				
-				lVect = new Point();
+				lVect = new PointXY();
 				for ( lWave in waves){
 					lWave.updateVectAt( lVect, lX, lY);
 				}

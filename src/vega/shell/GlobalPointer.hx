@@ -1,11 +1,11 @@
 package vega.shell;
 import js.Error;
 import pixi.core.display.DisplayObject;
-import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import pixi.interaction.InteractionEvent;
 import pixi.interaction.InteractionData;
 import haxe.extern.EitherType;
+import vega.utils.PointXY;
 
 /**
  * tracking de coordonnées globales de pointeur
@@ -124,7 +124,7 @@ class GlobalPointer {
 	 * on récupère les coordonnées globales du pointeur
 	 * @return	coordonnées globales, ou null si pointeur invalide
 	 */
-	public function getPointerCoord() : Point {
+	public function getPointerCoord() : PointXY {
 		if ( datas.length > 0) return datas[ 0].coord;
 		
 		return null;
@@ -207,7 +207,9 @@ class GlobalPointer {
 	
 	function onTouchDown( pE : InteractionEvent) : Void {
 		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
-		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
+		var lPt		: PointXY	= new PointXY();
+		
+		pE.data.getLocalPosition( getRepere(), cast lPt);
 		
 		if ( lTouch != null){
 			lTouch.coord	= lPt;
@@ -228,8 +230,10 @@ class GlobalPointer {
 	}
 	
 	function onTouchMove( pE : InteractionEvent) : Void {
-		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
+		var lPt		: PointXY	= new PointXY();
 		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
+		
+		pE.data.getLocalPosition( getRepere(), cast lPt);
 		
 		if ( lTouch != null){
 			lTouch.coord	= lPt;
@@ -242,7 +246,9 @@ class GlobalPointer {
 	
 	function onMouseDown( pE : InteractionEvent) : Void {
 		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
-		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
+		var lPt		: PointXY	= new PointXY();
+		
+		pE.data.getLocalPosition( getRepere(), cast lPt);
 		
 		if ( lTouch != null){
 			lTouch.coord	= lPt;
@@ -268,8 +274,10 @@ class GlobalPointer {
 	}
 	
 	function onMouseUp( pE : InteractionEvent) : Void {
-		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
+		var lPt		: PointXY	= new PointXY();
 		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
+		
+		pE.data.getLocalPosition( getRepere(), cast lPt);
 		
 		if ( lTouch != null){
 			lTouch.coord	= lPt;
@@ -291,8 +299,10 @@ class GlobalPointer {
 	}
 	
 	function onMouseMove( pE : InteractionEvent) : Void {
-		var lPt		: Point		= pE.data.getLocalPosition( getRepere());
+		var lPt		: PointXY	= new PointXY();
 		var lTouch	: TouchDesc	= getTouchId( pE.data.identifier);
+		
+		pE.data.getLocalPosition( getRepere(), cast lPt);
 		
 		if ( lTouch != null){
 			lTouch.coord	= lPt;
@@ -328,7 +338,7 @@ class GlobalPointer {
 	 * @param	pDoMouse	true pour inclure la souris à la recherche, false si que le touch pad
 	 * @return	touche enregistrée la plus proche, ou null si rien de trouvé
 	 */
-	function findNearestPos( pPos : Point, pDoMouse : Bool = false) : TouchDesc {
+	function findNearestPos( pPos : PointXY, pDoMouse : Bool = false) : TouchDesc {
 		var lDist	: Float		= -1;
 		var lRes	: TouchDesc	= null;
 		var lTmp	: Float;
@@ -384,7 +394,7 @@ class GlobalPointer {
  * descripteur de touche
  */
 class TouchDesc {
-	public var coord			: Point;
+	public var coord			: PointXY;
 	public var delay			: Float;
 	public var isMouse			: Bool;
 	public var isDown			: Bool;
@@ -392,7 +402,7 @@ class TouchDesc {
 	
 	public var isBound			: Bool						= false;
 	
-	public function new( pCoord : Point, pIsMouse : Bool, pIsDown : Bool, pId : EitherType<String,Int>) {
+	public function new( pCoord : PointXY, pIsMouse : Bool, pIsDown : Bool, pId : EitherType<String,Int>) {
 		/*if( pIsMouse){
 			ApplicationMatchSize.instance.traceDebug( "INFO : TouchDesc::TouchDesc : isMouse=" + pIsMouse + " ; isDown=" + pIsDown + " ; id=" + pId, true);
 			

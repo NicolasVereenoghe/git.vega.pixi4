@@ -1,6 +1,7 @@
 package vega.sprites;
-import pixi.core.math.Point;
+
 import vega.assets.AssetsMgr;
+import vega.utils.PointXY;
 import vega.utils.RectangleIJ;
 
 /**
@@ -12,7 +13,7 @@ class MyCell {
 	var _j									: Int;
 	var _dx									: Float;
 	var _dy									: Float;
-	var _scale								: Point;
+	var _scale								: PointXY;
 	var _rot								: Float;
 	var _dHint								: Float;
 	var _cellOffset							: RectangleIJ;
@@ -23,7 +24,7 @@ class MyCell {
 	
 	var _sprites							: Array<MySprite>;
 	
-	public function new( pI : Int, pJ : Int, pDX : Float, pDY : Float, pD : Float, pCellOffset : RectangleIJ, pLvlGroundMgr : LvlGroundMgr, pInstanceId : String = null, pSpId : String = null, pSpClass : Class<MySprite> = null, pScale : Point = null, pRot : Float = 0) {
+	public function new( pI : Int, pJ : Int, pDX : Float, pDY : Float, pD : Float, pCellOffset : RectangleIJ, pLvlGroundMgr : LvlGroundMgr, pInstanceId : String = null, pSpId : String = null, pSpClass : Class<MySprite> = null, pScale : PointXY = null, pRot : Float = 0) {
 		_i				= pI;
 		_j				= pJ;
 		_dx				= pDX;
@@ -99,7 +100,7 @@ class MyCell {
 	public function getJ() : Int { return _j; }
 	public function getDx() : Float { return _dx; }
 	public function getDy() : Float { return _dy; }
-	public function getScale() : Point { return _scale; }
+	public function getScale() : PointXY { return _scale; }
 	public function getRot() : Float { return _rot; }
 	public function getInstanceId() : String { return _instanceId; }
 	public function getLvlGroundMgr() : LvlGroundMgr { return _lvlGroundMgr; }

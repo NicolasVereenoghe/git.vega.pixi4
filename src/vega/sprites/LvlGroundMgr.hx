@@ -1,7 +1,8 @@
 package vega.sprites;
-import pixi.core.math.Point;
+
 import pixi.core.math.shapes.Rectangle;
 import vega.utils.PointIJ;
+import vega.utils.PointXY;
 import vega.utils.RectangleIJ;
 import vega.utils.Utils;
 
@@ -16,7 +17,7 @@ class LvlGroundMgr {
 	var _CELLS_PER_W				: Int									= -1;
 	var _CELLS_PER_H				: Int									= -1;
 	
-	var _COEF_PARALLAXE				: Point									= null;
+	var _COEF_PARALLAXE				: PointXY								= null;
 	
 	/** pile de clones de cellule de la map en cours (TODO) */
 	var restoreCells				: Array<MyCell>;
@@ -38,12 +39,12 @@ class LvlGroundMgr {
 	var _IS_CYCLE_GROUND			: Bool									= false;
 	var _IS_DEPTH_GROUND			: Bool									= true;
 	
-	public function new( pId : String, pLvlId : String, pCoefPara : Point = null, pCycleCadre : Rectangle = null, pIsDepthG : Bool = true, pClipping : Point = null) {
+	public function new( pId : String, pLvlId : String, pCoefPara : PointXY = null, pCycleCadre : Rectangle = null, pIsDepthG : Bool = true, pClipping : PointXY = null) {
 		cells 			= new Map<Int,Map<Int,Map<String,MyCell>>>();
 		restoreCells	= new Array<MyCell>();
 		
 		if ( pCoefPara != null) _COEF_PARALLAXE = pCoefPara;
-		else _COEF_PARALLAXE = new Point( 1, 1);
+		else _COEF_PARALLAXE = new PointXY( 1, 1);
 		
 		_IS_DEPTH_GROUND = pIsDepthG;
 		
@@ -114,7 +115,7 @@ class LvlGroundMgr {
 		return lRes2;
 	}
 	
-	public function createCell( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pIsSave : Bool = false, pRot : Float = 0) : MyCell {
+	public function createCell( pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : PointXY = null, pIsSave : Bool = false, pRot : Float = 0) : MyCell {
 		var lModX	: Float		= x2ModX( pX);
 		var lModY	: Float		= y2ModY( pY);
 		var lI		: Int		= x2i( lModX);
@@ -250,7 +251,7 @@ class LvlGroundMgr {
 	public function getCELL_H() : Float { return _CELL_H; }
 	public function getCELLS_PER_W() : Int { return _CELLS_PER_W; }
 	public function getCELLS_PER_H() : Int { return _CELLS_PER_H; }
-	public function getCOEF_PARALLAXE() : Point { return _COEF_PARALLAXE; }
+	public function getCOEF_PARALLAXE() : PointXY { return _COEF_PARALLAXE; }
 	public function getIS_CYCLE_GROUND() : Bool { return _IS_CYCLE_GROUND; }
 	public function getIS_DEPTH_GROUND() : Bool { return _IS_DEPTH_GROUND; }
 	

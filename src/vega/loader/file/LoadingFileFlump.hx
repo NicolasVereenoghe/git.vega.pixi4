@@ -3,7 +3,6 @@ import flump.json.FlumpJSON;
 import flump.json.FlumpJSON.AtlasSpec;
 import flump.library.FlumpLibrary;
 import haxe.Timer;
-import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import pixi.core.textures.BaseTexture;
 import pixi.core.textures.Texture;
@@ -11,6 +10,7 @@ import pixi.flump.Resource;
 import pixi.flump.Parser;
 import pixi.loaders.Loader;
 import vega.shell.ApplicationMatchSize;
+import vega.utils.PointXY;
 
 /**
  * ...
@@ -92,13 +92,13 @@ class LoadingFileFlump extends LoadingFile {
 		var lTexture	: BaseTexture			= new BaseTexture( pRes.data);
 		var lSpec		: TextureSpec;
 		var lFrame		: Rectangle;
-		var lOrigin		: Point;
+		var lOrigin		: PointXY;
 		
 		lTexture.resolution = 1;
 		
 		for( lSpec in lTxtSpecs){
 			lFrame	= new Rectangle( lSpec.rect.x, lSpec.rect.y, lSpec.rect.width, lSpec.rect.height);
-			lOrigin	= new Point( lSpec.origin.x, lSpec.origin.y);
+			lOrigin	= new PointXY( lSpec.origin.x, lSpec.origin.y);
 			
 			lOrigin.x	= lOrigin.x / lFrame.width;
 			lOrigin.y	= lOrigin.y / lFrame.height;

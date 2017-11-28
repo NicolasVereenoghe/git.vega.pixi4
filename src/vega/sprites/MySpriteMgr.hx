@@ -1,10 +1,10 @@
 package vega.sprites;
 import js.Error;
 import pixi.core.display.Container;
-import pixi.core.math.Point;
 import vega.camera.MyCamera;
 import vega.shell.IGameMgr;
 import vega.utils.PointIJ;
+import vega.utils.PointXY;
 import vega.utils.RectangleIJ;
 
 /**
@@ -122,7 +122,7 @@ class MySpriteMgr {
 	 * @param	pRot			orientation en rad
 	 * @return	la cellule de sprite créée
 	 */
-	public function addSpriteCell( pGroundId : String, pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : Point = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
+	public function addSpriteCell( pGroundId : String, pDepth : Float, pX : Float, pY : Float, pCellOffset : RectangleIJ, pSpID : String = null, pSpClass : Class<MySprite> = null, pInstanceID : String = null, pScale : PointXY = null, pForceDisplay : Bool = false, pRot : Float = 0) : MyCell {
 		return getGround( pGroundId).addSpriteCell( pDepth, pX, pY, pCellOffset, pSpID, pSpClass, pInstanceID, pScale, pForceDisplay, pRot);
 	}
 	

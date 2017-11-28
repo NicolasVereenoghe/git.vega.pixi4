@@ -1,9 +1,9 @@
 package vega.effect.wavegrid;
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
-import pixi.core.math.Point;
 import pixi.flump.Movie;
 import vega.assets.AssetInstance;
+import vega.utils.PointXY;
 
 /**
  * une case de grille de vagues
@@ -32,7 +32,7 @@ class MyWaveCell {
 	 * @param	pRay		rayon max de vague
 	 * @param	pVect		vecteur de vague initiale
 	 */
-	public function init( pAsset : AssetInstance, pSurface : Container, pSize : Float, pRay : Float, pVect : Point) : Void {
+	public function init( pAsset : AssetInstance, pSurface : Container, pSize : Float, pRay : Float, pVect : PointXY) : Void {
 		asset	= pAsset;
 		surface	= pSurface;
 		side	= pSize;
@@ -57,7 +57,7 @@ class MyWaveCell {
 	 * @param	pDT		delta t en ms
 	 * @param	pVect	vecteur de vague à rendre
 	 */
-	public function doFrame( pDT : Float, pVect : Point) : Void {
+	public function doFrame( pDT : Float, pVect : PointXY) : Void {
 		updateWave( pVect);
 	}
 	
@@ -83,7 +83,7 @@ class MyWaveCell {
 	 * on met à jour le rendu de vague à partir d'un vecteur vague
 	 * @param	pVect	vecteur vague
 	 */
-	function updateWave( pVect : Point) : Void {
+	function updateWave( pVect : PointXY) : Void {
 		var lD2		: Float			= pVect.x * pVect.x + pVect.y * pVect.y;
 		var lRatio	: Float			= rayMax / ( side / 2);
 		var lMc		: Movie	= cast asset.getContent();

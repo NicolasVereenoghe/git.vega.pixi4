@@ -2,11 +2,11 @@ package vega.sprites;
 
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject.DestroyOptions;
-import pixi.core.math.Point;
 import pixi.core.math.shapes.Rectangle;
 import pixi.flump.Movie;
 import vega.assets.AssetInstance;
 import vega.assets.AssetsMgr;
+import vega.utils.PointXY;
 import vega.utils.UtilsFlump;
 import vega.utils.UtilsPixi;
 import haxe.extern.EitherType;
@@ -74,7 +74,7 @@ class MySprite extends Container {
 	 * @param	pXY		coordonnées de scène de jeu du contact de l'interaction ; null si pas défini
 	 * @return	true si l'effet est résolu, false si non résolu et pourrait faire l'objet d'autres appels à d'autres coordonnées pour voir si ça le résoud
 	 */
-	public function doEffect( pSp : MySprite, pXY : Point = null) : Bool { return true; }
+	public function doEffect( pSp : MySprite, pXY : PointXY = null) : Bool { return true; }
 	
 	/**
 	 * un autre sprite demande de tester une collision avec un point de contact
@@ -83,7 +83,7 @@ class MySprite extends Container {
 	 * @param	pIsFeet	true si point de contact de pied
 	 * @return	true si collision, false sinon
 	 */
-	public function doBounce( pSp : MySprite, pXY : Point = null, pIsFeet : Bool = true) : Bool { return false; }
+	public function doBounce( pSp : MySprite, pXY : PointXY = null, pIsFeet : Bool = true) : Bool { return false; }
 	
 	public function getSpDHint( pGrndMgr : GroundMgr, pDHint : Float) : Float { return pDHint; }
 	public function getDesc() : MyCell { return _desc; }

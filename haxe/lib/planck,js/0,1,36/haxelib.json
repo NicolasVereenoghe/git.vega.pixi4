@@ -10,12 +10,12 @@
 		"extern",
 		"web"
 	],
-	"description": "Externs of planck.js v0.1.34 for Haxe",
+	"description": "Externs of planck.js v0.1.36 for Haxe",
 	"contributors": [
 		"NicolasVereenoghe"
 	],
 	"releasenote": "first release",
-	"version": "0.1.34",
+	"version": "0.1.36",
 	"url": "",
 	"dependencies": {}
 }

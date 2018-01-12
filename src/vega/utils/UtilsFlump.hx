@@ -291,8 +291,6 @@ class UtilsFlump {
 	 * @param	pForce			par défaut on force le reset de "loop" ; si false, on arrête le traitement dès qu'on a trouvé un cas déjà traité (optim)
 	 */
 	public static function recursiveSetLoop( pCont : Container, pIsLoop : Bool, pExcludeLayerSubId : Array<String> = null, pForce : Bool = true) : Void {
-		var lChild		: DisplayObject;
-		var lStr		: String;
 		var lIsExclude	: Bool;
 		
 		if ( Std.is( pCont, Movie)){
@@ -303,13 +301,13 @@ class UtilsFlump {
 			}
 		}
 		
-		for ( lChild in pCont.children){
-			if ( Std.is( lChild, Container)){
+		for ( iChild in pCont.children){
+			if ( Std.is( iChild, Container)){
 				if ( pExcludeLayerSubId != null){
 					lIsExclude = false;
 					
-					for ( lStr in pExcludeLayerSubId){
-						if ( lChild.name.indexOf( lStr) != -1){
+					for ( iStr in pExcludeLayerSubId){
+						if ( Std.is( pCont, Movie) && iChild.name == null && getLayerName( iChild).indexOf( iStr) != -1 || iChild.name != null && iChild.name.indexOf( iStr) != -1){
 							lIsExclude = true;
 							break;
 						}
@@ -318,7 +316,7 @@ class UtilsFlump {
 					if ( lIsExclude) continue;
 				}
 				
-				recursiveSetLoop( cast lChild, pIsLoop, pExcludeLayerSubId);
+				recursiveSetLoop( cast iChild, pIsLoop, pExcludeLayerSubId);
 			}
 		}
 	}

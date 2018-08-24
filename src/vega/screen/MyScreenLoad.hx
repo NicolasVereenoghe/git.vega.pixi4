@@ -27,7 +27,7 @@ class MyScreenLoad extends MyScreen {
 	
 	function doModeProgress( pTime : Float) : Void {
 		if( curRate < toRate){
-			curRate += Math.min( toRate - curRate, MAX_POINTS_PER_FRAME);
+			curRate = Math.min( curRate + Math.min( toRate - curRate, MAX_POINTS_PER_FRAME), 1);
 		}else if ( curRate == 1 && isComplete) doLoadFinal();
 	}
 }

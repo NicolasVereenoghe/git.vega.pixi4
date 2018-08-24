@@ -1,0 +1,19 @@
+{
+	"name": "closure",
+	"license": "MIT",
+	"tags": [
+		"js",
+		"uglify",
+		"minify",
+		"obfuscation",
+		"closure"
+	],
+	"classPath": "src",
+	"description": "Google Closure Compiler plugin for Haxe builds.",
+	"contributors": [
+		"back2dos"
+	],
+	"releasenote": "Added new flag `closure_slavemode` to disable minification without setting `closure_disabled` in order to avoid confusion when controlled by other tools like Modular.",
+	"version": "0.3.1",
+	"url": "https://github.com/back2dos/closure"
+}

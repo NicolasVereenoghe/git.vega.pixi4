@@ -20,7 +20,11 @@ class LocalMgr {
 	
 	public var TXT_SEP							: String				= "_";
 	
+	public var GLOBAL_TAG						: String				= "global";
+	
 	var TXT_PREFIX								: String				= "txt";
+	
+	var STYLES									: Dynamic				= null;
 	
 	var defaultLang								: String;
 	var conf									: Dynamic				= null;
@@ -32,12 +36,17 @@ class LocalMgr {
 	 * création du singleton de gestionnaire de localisation
 	 * @param	pConf	données de loader du fichier de localisation ; supporte le json et le xml (reconverti en json)
 	 * @param	pLang	id de langue par défaut, ou laisser null pour que ce soit déterminé par le navigateur
+	 * @param	pStyles	map d'instance TextStyle, indexée par noms de styles ; "default" est un nom réservé ; null : ne pas utiliser de styles
 	 */
-	public function new( pConf : Dynamic, pLang : String = null) {
-		var lLocal	: String;
-		
+	public function new( pConf : Dynamic, pLang : String = null, pStyles : Dynamic = null) {
 		instance	= this;
 		
+		STYLES		= pStyles;
+		
+		doInit( pConf, pLang);
+	}
+	
+	function doInit( pConf : Dynamic, pLang : String = null) : Void {
 		if ( pConf.documentElement != null) conf = xml2Json( pConf);
 		else conf = pConf.local;
 		
@@ -47,18 +56,23 @@ class LocalMgr {
 		
 		if ( pLang == null && Browser.supported) pLang = Browser.navigator.language;
 		
-		for ( lLocal in Reflect.fields( conf)){
-			if ( lLocal == pLang){
-				defaultLang = lLocal;
+		for ( iLocal in Reflect.fields( conf)){
+			if ( iLocal == pLang){
+				defaultLang = iLocal;
 				break;
 			}
 		}
 		
-		if ( defaultLang == null) defaultLang = Reflect.fields( conf)[ 0];
+		if ( defaultLang == null){
+			if ( Reflect.fields( conf).length > 1){
+				if ( Reflect.fields( conf)[ 0] != GLOBAL_TAG) defaultLang = Reflect.fields( conf)[ 0];
+				else defaultLang = Reflect.fields( conf)[ 1];
+			} else defaultLang = Reflect.fields( conf)[ 0];
+		}
 		
 		//defaultLang = "en";
 		
-		ApplicationMatchSize.instance.traceDebug( "INFO : LocalMgr::LocalMgr : defaultLang = " + defaultLang, true);
+		ApplicationMatchSize.instance.traceDebug( "INFO : LocalMgr::doInit : defaultLang = " + defaultLang, true);
 	}
 	
 	/**
@@ -125,11 +139,12 @@ class LocalMgr {
 	 */
 	public function getCurLangInd() : Int {
 		var lCtr	: Int		= 0;
-		var lLocal	: String;
 		
-		for ( lLocal in Reflect.fields( conf)) {
-			if ( lLocal == defaultLang) return lCtr;
-			else lCtr++;
+		for ( iLocal in Reflect.fields( conf)) {
+			if( iLocal != GLOBAL_TAG){
+				if ( iLocal == defaultLang) return lCtr;
+				else lCtr++;
+			}
 		}
 		
 		ApplicationMatchSize.instance.traceDebug( "ERROR : LocalMgr::getCurLangInd : " + defaultLang + " not found !");
@@ -144,11 +159,12 @@ class LocalMgr {
 	 */
 	public function fromIndToId( pInd : Int) : String {
 		var lCtr	: Int		= 0;
-		var lLocal	: String;
 		
-		for ( lLocal in Reflect.fields( conf)) {
-			if ( lCtr == pInd) return lLocal;
-			else lCtr++;
+		for ( iLocal in Reflect.fields( conf)) {
+			if( iLocal != GLOBAL_TAG){
+				if ( lCtr == pInd) return iLocal;
+				else lCtr++;
+			}
 		}
 		
 		ApplicationMatchSize.instance.traceDebug( "INFO : LocalMgr::fromIndToId : " + pInd + " out of bounds");
@@ -162,9 +178,8 @@ class LocalMgr {
 	 */
 	public function getNbLangs() : Int {
 		var lCtr	: Int		= 0;
-		var lLocal	: String;
 		
-		for ( lLocal in Reflect.fields( conf)) lCtr++;
+		for ( iLocal in Reflect.fields( conf)) if( iLocal != GLOBAL_TAG) lCtr++;
 		
 		return lCtr;
 	}
@@ -175,13 +190,11 @@ class LocalMgr {
 	 * @param	pNoDispatch	mettre true pour empêcher la propagation de l'info de mise à jour de langue ; laisser false par défaut pour dispatcher
 	 */
 	public function swapLang( pLangId : String, pNoDispatch : Bool = false) : Void {
-		var lListener	: Void->Void;
-		
 		if ( pLangId != defaultLang) {
 			defaultLang = pLangId;
 			
 			if ( ! pNoDispatch) {
-				for ( lListener in listeners) lListener();
+				for ( iListener in listeners) iListener();
 			}
 		}
 	}
@@ -199,35 +212,54 @@ class LocalMgr {
 	public function remListener( pListener : Void -> Void) : Void { listeners.remove( pListener); }
 	
 	public function getLocalTxt( pId : String, pForceLang : String = null) : String {
+		var lLocals	: Dynamic;
+		
 		if ( pId == null || pId == "") return "";
 		
 		if ( pForceLang == null) pForceLang = defaultLang;
 		
-		return Reflect.getProperty( Reflect.getProperty( conf, pForceLang), pId);
+		lLocals = Reflect.getProperty( conf, pForceLang);
+		
+		if( ! Reflect.hasField( lLocals, pId)) return Reflect.getProperty( Reflect.getProperty( conf, GLOBAL_TAG), pId);
+		
+		return Reflect.getProperty( lLocals, pId);
 	}
 	
 	public function instanciateTxtFromFlumpModel( pTxtId : String, pModelInstance : Movie, pVal : String = null) : Text {
 		var lLayer		: Layer			= UtilsFlump.getLayerWithPrefixInMovie( pTxtId, pModelInstance);
 		var lLayerCont	: Container		= cast pModelInstance.getLayer( lLayer.name).getChildAt( 0);
 		var lDesc		: TxtDescFlump	= new TxtDescFlump( lLayer.name);
-		var lParams		: Dynamic;
+		var lParams		: TextStyle		= new TextStyle();
+		var lStyles		: Dynamic;
 		var lTxt		: Text;
 		
-		lParams	= {
-			//"font": lDesc.size + "px " + lDesc.fontId,
-			"fontFamily": lDesc.fontId,
-			"fontSize": lDesc.size,
-			"fill": lDesc.color,
-			"align": lDesc.align,
-			"padding": lDesc.size
-		};
+		lParams.fontFamily	= lDesc.fontId;
+		lParams.fontSize	= lDesc.size;
+		lParams.fill		= lDesc.color;
+		lParams.align		= lDesc.align;
+		lParams.padding		= lDesc.size;
+		lParams.lineHeight	= lDesc.lineHeight;
 		
 		addWordWrapParams( lDesc, lParams);
 		
-		lTxt = new Text(
-			pVal == null ? getLocalTxt( lDesc.localId) : pVal,
-			lParams
-		);
+		if ( pVal == null){
+			if( lDesc.forcedLangI >= 0) pVal = getLocalTxt( lDesc.localId, fromIndToId( lDesc.forcedLangI));
+			else pVal = getLocalTxt( lDesc.localId);
+		}
+		
+		lStyles = checkStyles( pVal, lParams);
+		
+		if( lStyles == null){
+			lTxt = new Text(
+				pVal,
+				lParams
+			);
+		}else{
+			lTxt = new MultiStyleText(
+				pVal,
+				lStyles
+			);
+		}
 		
 		ApplicationMatchSize.instance.traceDebug( "INFO : LocalMgr::instanciateTxtFromFlumpModel : " + lDesc.localId + " : " + lTxt.text);
 		
@@ -242,10 +274,9 @@ class LocalMgr {
 	
 	public function parseAndSetLocalTxtInMovie( pCont : Movie) : Void {
 		var lLayers	: Array<Layer>	= UtilsFlump.getLayersWithPrefixInMovie( TXT_PREFIX, pCont);
-		var lLayer	: Layer;
 		
-		for ( lLayer in lLayers){
-			try{ instanciateTxtFromFlumpModel( lLayer.name, pCont); } catch ( pE : Dynamic) { trace( pE); continue; }
+		for ( iLayer in lLayers){
+			try{ instanciateTxtFromFlumpModel( iLayer.name, pCont); } catch ( pE : Dynamic) { trace( pE); continue; }
 		}
 	}
 	
@@ -270,10 +301,9 @@ class LocalMgr {
 	 */
 	public function updateLocalTxtInMovie( pCont : Movie) : Void {
 		var lLayers	: Array<Layer>	= UtilsFlump.getLayersWithPrefixInMovie( TXT_PREFIX, pCont);
-		var lLayer	: Layer;
 		
-		for ( lLayer in lLayers) {
-			try { updateTxtFromFlumpModel( lLayer.name, pCont); } catch ( pE : Dynamic) { trace( pE); continue; }
+		for ( iLayer in lLayers) {
+			try { updateTxtFromFlumpModel( iLayer.name, pCont); } catch ( pE : Dynamic) { trace( pE); continue; }
 		}
 	}
 	
@@ -281,22 +311,58 @@ class LocalMgr {
 	
 	public function freeLocalTxtInMovie( pCont : Movie) : Void {
 		var lLayers	: Array<Layer>	= UtilsFlump.getLayersWithPrefixInMovie( TXT_PREFIX, pCont);
-		var lLayer	: Layer;
 		var lDesc	: TxtDescFlump;
 		var lTxt	: DisplayObject;
 		var lCont	: Container;
 		
-		for ( lLayer in lLayers){
-			try { lDesc = new TxtDescFlump( lLayer.name); } catch ( pE : Dynamic) { trace( pE); continue; }
-			lCont	= cast pCont.getLayer( lLayer.name).getChildAt( 0);
-			lTxt	= lCont.getChildAt( lCont.children.length - 1);
+		for ( iLayer in lLayers){
+			try { lDesc = new TxtDescFlump( iLayer.name); } catch ( pE : Dynamic) { trace( pE); continue; }
+			lCont	= cast pCont.getLayer( iLayer.name).getChildAt( 0);
 			
-			pCont.removeChild( lTxt);
-			lTxt.destroy();
+			if( lCont.children.length > 0){
+				lTxt = lCont.getChildAt( lCont.children.length - 1);
+				
+				if ( Std.is( lTxt, Text)){
+					pCont.removeChild( lTxt);
+					lTxt.destroy();
+				}
+			}
 		}
 	}
 	
 	public function recursiveFreeLocalTxt( pCont : Container) : Void { recursiveApply( pCont, freeLocalTxtInMovie); }
+	
+	function checkStyles( pTxt : String, pDefault : TextStyle) : Dynamic {
+		var lRes	: Dynamic;
+		
+		if ( STYLES == null) return null;
+		else{
+			for ( iStyle in Reflect.fields( STYLES)){
+				if ( pTxt.indexOf( "<" + iStyle + ">") != -1){
+					lRes = Reflect.copy( STYLES);
+					
+					Reflect.setField(
+						lRes,
+						"default",
+						{
+							"fontFamily": pDefault.fontFamily,
+							"fontSize": pDefault.fontSize,
+							"fill": pDefault.fill,
+							"align": pDefault.align,
+							"padding": pDefault.padding,
+							"wordWrap": pDefault.wordWrap,
+							"wordWrapWidth": pDefault.wordWrapWidth,
+							"lineHeight": pDefault.lineHeight
+						}
+					);
+					
+					return lRes;
+				}
+			}
+			
+			return null;
+		}
+	}
 	
 	function alignTxt( pTxt : Text, pDesc : TxtDescFlump) : Void {
 		if ( pDesc.align == TxtDescFlump.ALIGN_CENTER) pTxt.x = -pTxt.width / 2;
@@ -307,16 +373,14 @@ class LocalMgr {
 	}
 	
 	function recursiveApply( pCont : Container, pFunc : Movie -> Void) : Void {
-		var lChild	: DisplayObject;
-		
-		for ( lChild in pCont.children){
-			if ( Std.is( lChild, Container)) recursiveApply( cast lChild, pFunc);
+		for ( iChild in pCont.children){
+			if ( Std.is( iChild, Container)) recursiveApply( cast iChild, pFunc);
 		}
 		
 		if ( Std.is( pCont, Movie)) pFunc( cast pCont);
 	}
 	
-	function addWordWrapParams( pDesc : TxtDescFlump, pParams : Dynamic) : Dynamic {
+	function addWordWrapParams( pDesc : TxtDescFlump, pParams : TextStyle) : TextStyle {
 		if ( pDesc.wordWrap > 0) {
 			pParams.wordWrap = true;
 			pParams.wordWrapWidth = pDesc.wordWrap;

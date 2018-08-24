@@ -1,0 +1,61 @@
+{
+  "name": "pixi-multistyle-text",
+  "version": "0.6.0",
+  "description": "Multi-Style Text for pixi.js",
+  "source": "src/pixi-multistyle-text.ts",
+  "main": "dist/pixi-multistyle-text.js",
+  "umd:main": "dist/pixi-multistyle-text.umd.js",
+  "module": "dist/pixi-multistyle-text.m.js",
+  "types": "dist/pixi-multistyle-text.d.ts",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tleunen/pixi-multistyle-text.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tleunen/pixi-multistyle-text/issues"
+  },
+  "homepage": "https://github.com/tleunen/pixi-multistyle-text",
+  "keywords": [
+    "pixi",
+    "pixi.js",
+    "text",
+    "multistyle",
+    "multi style",
+    "style",
+    "canvas",
+    "webgl",
+    "graphics",
+    "render",
+    "2d"
+  ],
+  "author": "Tommy Leunen <tommy.leunen@gmail.com> (http://tommyleunen.com/)",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/pixi.js": "^4.8.0",
+    "argos-cli": "0.0.9",
+    "fs-extra": "^6.0.1",
+    "happo": "^5.0.0",
+    "happo-target-firefox": "^5.0.2",
+    "microbundle": "^0.4.4",
+    "pixi.js": "^4.8.1",
+    "standard-version": "^4.4.0",
+    "typescript": "^2.9.2"
+  },
+  "peerDependencies": {
+    "pixi.js": "^4.5.6"
+  },
+  "scripts": {
+    "demo": "npm run build && open demo/index.html",
+    "dev": "microbundle watch",
+    "build": "microbundle --name MultiStyleText",
+    "prepublish": "npm run build",
+    "release": "standard-version",
+    "snapshot": "rm -rf happo-snapshots && happo run",
+    "happo": "./scripts/happo-ci.sh",
+    "test": "npm run happo"
+  }
+}

@@ -19,6 +19,8 @@ class TxtDescFlump {
 	public var color		: String;
 	public var wordWrap		: Float						= -1;
 	public var vAlign		: String;
+	public var lineHeight	: Float						= 0;
+	public var forcedLangI	: Int						= -1;
 	
 	public function new( pLayerData : String) {
 		var lDatas	: Array<String>	= pLayerData.split( LocalMgr.instance.TXT_SEP);
@@ -33,5 +35,7 @@ class TxtDescFlump {
 		
 		if ( lDatas.length > 6) wordWrap = Std.parseFloat( lDatas[ 6]);
 		if ( lDatas.length > 7) vAlign = lDatas[ 7];
+		if ( lDatas.length > 8) lineHeight = Std.parseFloat( lDatas[ 8]);
+		if ( lDatas.length > 9 && lDatas[ 9] != "") forcedLangI = Std.parseInt( lDatas[ 9]);
 	}
 }

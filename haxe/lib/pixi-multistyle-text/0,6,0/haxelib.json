@@ -1,0 +1,23 @@
+{
+    "name": "pixi-multistyle-text",
+    "classPath": "src",
+    "license": "MIT",
+    "tags": [
+	"js",
+	"haxe",
+	"pixi",
+	"web",
+	"multistyle",
+	"text"
+    ],
+    "description": "Externs of pixi-multistyle-text v0.6.0 for Haxe",
+    "contributors": [
+	"NicolasVereenoghe"
+    ],
+    "releasenote": "extern first release",
+    "version": "0.6.0",
+    "url": "https://github.com/tleunen/pixi-multistyle-text",
+    "dependencies": {
+		"pixijs": ""
+    }
+}

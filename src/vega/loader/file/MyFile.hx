@@ -9,14 +9,18 @@ class MyFile {
 	public static inline var NO_VERSION			: String			= "NO-VERSION";
 	public static inline var VERSION_NO_CACHE	: String			= "NO-CACHE";
 	
+	public static var EXT_PATH					: String			= null;
+	
 	var _name									: String;
 	var _path									: String;
 	var _version								: String;
 	
 	public function new( pName : String, pPath : String = null, pVersion : String = null) {
 		_name		= pName;
-		_path		= pPath;
 		_version	= pVersion != null ? pVersion : ApplicationMatchSize.instance.version;
+		
+		if ( EXT_PATH != null &&  EXT_PATH != "") _path = ( pPath != null ? EXT_PATH + pPath : EXT_PATH);
+		else _path = pPath;
 	}
 	
 	public function getId() : String { return ( _path != null ? _path + ":" : "") + _name; }

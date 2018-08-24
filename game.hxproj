@@ -36,6 +36,7 @@
     <library name="pixi-flump-runtime" />
     <library name="howlerjs" />
     <library name="planck.js" />
+    <library name="pixi-multistyle-text" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>

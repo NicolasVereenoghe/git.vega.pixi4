@@ -3,6 +3,7 @@ import haxe.Timer;
 import pixi.loaders.Loader;
 import vega.loader.VegaLoader;
 import vega.shell.ApplicationMatchSize;
+import pixi.loaders.Resource.ResourceType;
 
 /**
  * ...
@@ -53,9 +54,15 @@ class LoadingFile {
 		}else return null;
 	}
 	
-	public function isIMG() : Bool { return Reflect.getProperty( loader.resources, _file.getId()).isImage; }
+	public function isIMG() : Bool {
+		/* DEPRECATED : return Reflect.getProperty( loader.resources, _file.getId()).isImage;*/
+		return Reflect.getProperty( loader.resources, _file.getId()).type == ResourceType.IMAGE;
+	}
 	
-	public function isJson() : Bool { return Reflect.getProperty( loader.resources, _file.getId()).isJson != false; }
+	public function isJson() : Bool {
+		/* DEPRECATED : return Reflect.getProperty( loader.resources, _file.getId()).isJson != false;*/
+		return Reflect.getProperty( loader.resources, _file.getId()).type == ResourceType.JSON;
+	}
 	
 	public function getUrl() : String { return Reflect.getProperty( loader.resources, _file.getId()).url; }
 	

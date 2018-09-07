@@ -259,6 +259,8 @@ class AssetDesc {
 			}else if ( lRender.type == AssetRender.TYPE_FLUMP_SP){
 				return new AssetInstance( this, new pixi.flump.Sprite( export, getFile().getId()));
 			}
+		}else if ( lRender.render == AssetRender.RENDER_VIDEO){
+			return new AssetInstance( this, new pixi.core.sprites.Sprite( cast VegaLoaderMgr.getInstance().getLoadingFile( getFile().getId()).getLoadedContent()));
 		}
 		
 		return new AssetInstance( this, new pixi.core.sprites.Sprite());

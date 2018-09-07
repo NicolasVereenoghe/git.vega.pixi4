@@ -111,15 +111,16 @@ class LoadingFile {
 		}else onError();
 	}
 	
-	function getUrlRequest( pForceNoCache : Bool = false) : String {
-		var lName		: String	= _file.getName();
-		var lPath		: String	= _file.getPath() != null ? _file.getPath() : "";
+	function getUrlRequest( pForceNoCache : Bool = false, pFile : MyFile = null) : String {
+		var lFile		: MyFile	= pFile == null ? _file : pFile;
+		var lName		: String	= lFile.getName();
+		var lPath		: String	= lFile.getPath() != null ? lFile.getPath() : "";
 		var lUrl		: String;
 		
 		if( lName.indexOf( "://") != -1) lUrl = lName;
 		else lUrl = lPath + lName;
 		
-		lUrl = addVersionToUrl( lUrl, getVersionUrl( _file, pForceNoCache));
+		lUrl = addVersionToUrl( lUrl, getVersionUrl( lFile, pForceNoCache));
 		
 		return lUrl;
 	}

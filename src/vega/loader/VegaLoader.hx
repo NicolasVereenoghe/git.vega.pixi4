@@ -6,6 +6,7 @@ import vega.loader.file.LoadingFileFlump;
 import vega.loader.file.LoadingFileFont;
 import vega.loader.file.LoadingFileHowl;
 import vega.loader.file.LoadingFileTxt;
+import vega.loader.file.LoadingFileVideo;
 import vega.loader.file.MyFile;
 import vega.shell.ApplicationMatchSize;
 import vega.sound.SndDesc;
@@ -39,6 +40,16 @@ class VegaLoader {
 		
 		fileLoads	= null;
 		listener	= null;
+	}
+	
+	public function addVideoFile( pFile : MyFile, pSrts : Map<String,MyFile> = null) : Void {
+		fileLoads.push( new LoadingFileVideo( pFile));
+		
+		if( pSrts != null){
+			for ( iFile in pSrts){
+				fileLoads.push( new LoadingFileTxt( iFile));
+			}
+		}
 	}
 	
 	public function addFlumpFile( pFile : MyFile) : Void { fileLoads.push( new LoadingFileFlump( pFile)); }

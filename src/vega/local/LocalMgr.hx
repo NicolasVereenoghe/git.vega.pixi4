@@ -237,7 +237,7 @@ class LocalMgr {
 		lParams.fontSize	= lDesc.size;
 		lParams.fill		= lDesc.color;
 		lParams.align		= lDesc.align;
-		lParams.padding		= lDesc.size;
+		//lParams.padding		= lDesc.size; // ça fait rater le multi style
 		lParams.lineHeight	= lDesc.lineHeight;
 		
 		addWordWrapParams( lDesc, lParams);
@@ -349,7 +349,7 @@ class LocalMgr {
 							"fontSize": pDefault.fontSize,
 							"fill": pDefault.fill,
 							"align": pDefault.align,
-							"padding": pDefault.padding,
+							//"padding": pDefault.padding, // ça fait rater le multi style
 							"wordWrap": pDefault.wordWrap,
 							"wordWrapWidth": pDefault.wordWrapWidth,
 							"lineHeight": pDefault.lineHeight

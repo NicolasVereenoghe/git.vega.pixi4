@@ -292,6 +292,7 @@ class AssetsMgr {
 					//ApplicationMatchSize.instance.traceDebug( "INFO : AssetsMgr::loadPatternAsset : addFile " + lFile.getId());
 					
 					if ( lAsset.getRender().render == AssetRender.RENDER_FLUMP) pLoader.addFlumpFile( lFile);
+					else if( lAsset.getRender().render == AssetRender.RENDER_VIDEO) pLoader.addVideoFile( lFile, lAsset.getRender().srts);
 					else pLoader.addDisplayFile( lFile);
 				}
 			}

@@ -32,6 +32,10 @@ class ApplicationMatchSize extends Application {
 	public var debugMotifs						: Array<String>	= null;
 	/** taille de font de trace debug */
 	public var debugFontSize					: Int			= 12;// 25;
+	/** flag indiquant si le scale du rendu peut être adapté pour se caller au mieux dans le canvas (true), ou si on travaille en taille fixe (false) */
+	public var allowScale						: Bool			= true;
+	/** flag indiquant si le calage de l'appli (conteneur principal) se fait au centre (false) ou sur le coin haut gauche */
+	public var isTL								: Bool			= false;
 	
 	public var version							: String;
 	
@@ -97,7 +101,9 @@ class ApplicationMatchSize extends Application {
 		var lTxt	: Text;
 		var lMax	: Int;
 		
+		#if debug
 		trace( pTxt);
+		#end
 		
 		if ( debug){
 			if( ! ( pForce || detectDebugMotifIn( pTxt))){
@@ -387,29 +393,42 @@ class ApplicationMatchSize extends Application {
 	}
 	
 	function updateSize() : Void {
-		var lNewW	: Float	= width;
+		/*var lCurW	: Float	= allowScale ? width : _MIN_WIDTH;
+		var lCurH	: Float	= allowScale ? height : _MIN_HEIGHT;*/
+		var lCurW	: Float	= width;
+		var lCurH	: Float	= height;
+		var lNewW	: Float	= lCurW;
 		var lNewH	: Float	= lNewW * _MIN_HEIGHT / _MIN_WIDTH;
 		
-		if ( lNewH > height) lNewW = height * _MIN_WIDTH / _MIN_HEIGHT;
+		if ( lNewH > height) lNewW = lCurH * _MIN_WIDTH / _MIN_HEIGHT;
 		
-		_baseScale			= lNewW / _MIN_WIDTH;
+		if ( allowScale) _baseScale = lNewW / _MIN_WIDTH;
+		else _baseScale = 1;
 		
-		lNewW				= Math.min( width / _baseScale, _EXT_WIDTH);
-		lNewH				= Math.min( height / _baseScale, _EXT_HEIGHT);
+		lNewW				= Math.min( lCurW / _baseScale, _EXT_WIDTH);
+		lNewH				= Math.min( lCurH / _baseScale, _EXT_HEIGHT);
 		
 		_screenRect			= new Rectangle( -lNewW / 2, -lNewH / 2, lNewW, lNewH);
 		
 		_container.scale.x	= _baseScale;
 		_container.scale.y	= _baseScale;
-		_container.x		= width / 2;
-		_container.y		= height / 2;
 		
-		_hit.scale.x		= _baseScale;
-		_hit.scale.y		= _baseScale;
-		_hit.x				= width / 2;
-		_hit.y				= height / 2;
-		cast( _hit.getChildAt( 0), Graphics).width	= width / _baseScale;
-		cast( _hit.getChildAt( 0), Graphics).height	= height / _baseScale;
+		cast( _hit.getChildAt( 0), Graphics).width	= lCurW;
+		cast( _hit.getChildAt( 0), Graphics).height	= lCurH;
+		
+		if( ! isTL){
+			_container.x		= Math.round( lCurW / 2);
+			_container.y		= Math.round( lCurH / 2);
+			
+			_hit.x				= _container.x;
+			_hit.y				= _container.y;
+		}else{
+			_container.x		= Math.round( lNewW / 2);//Math.round( lCurW / 2);
+			_container.y		= Math.round( lNewH / 2);//Math.round( lCurH / 2);
+			
+			_hit.x				= lCurW / 2;
+			_hit.y				= lCurH / 2;
+		}
 		
 		if ( _borders == null){
 			_borders	= new Graphics();
@@ -424,7 +443,7 @@ class ApplicationMatchSize extends Application {
 			_container.addChild( _borders);
 		}
 		
-		traceDebug( "INFO : ApplicationMatchSize::updateSize : scale=" + ( Math.round( _baseScale * 100) / 100) + " ; screen=" + Math.round( _screenRect.width) + "x" + Math.round( _screenRect.height) + " ; stage=" + width + "x" + height, true);
+		traceDebug( "INFO : ApplicationMatchSize::updateSize : scale=" + ( Math.round( _baseScale * 100) / 100) + " ; screen=" + Math.round( _screenRect.width) + "x" + Math.round( _screenRect.height) + " ; stage=" + lCurW + "x" + lCurH, true);
 		
 		if ( _debugContainer != null){
 			_debugContainer.x	= _screenRect.x;

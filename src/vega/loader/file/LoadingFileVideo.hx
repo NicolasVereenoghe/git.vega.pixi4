@@ -21,6 +21,8 @@ class LoadingFileVideo extends LoadingFile {
 	
 	override function freeLoader() : Void {
 		if ( vdoTexture != null){
+			cast( vdoTexture.baseTexture, VideoBaseTexture).dispose();
+			
 			vdoTexture.destroy( true);
 			
 			vdoTexture = null;
@@ -31,6 +33,7 @@ class LoadingFileVideo extends LoadingFile {
 		vdoTexture	= Texture.fromVideoUrl( getUrlRequest());
 		
 		cast( vdoTexture.baseTexture, VideoBaseTexture).autoPlay = false;
+		//cast( vdoTexture.baseTexture, VideoBaseTexture).autoUpdate = false;
 		
 		vdoTexture.baseTexture.addListener( "loaded", onLoadComplete);
 		vdoTexture.baseTexture.addListener( "error", onError);

@@ -58,7 +58,7 @@ class VideoSrt {
 			lI = findNextChunkLineI( lLines, lEndI + 1);
 		}
 		
-		trace( chunks);
+		//trace( chunks);
 	}
 	
 	public function destroy() : Void {

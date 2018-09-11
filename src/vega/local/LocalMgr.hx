@@ -9,28 +9,32 @@ import pixi.core.text.Text;
 import pixi.core.text.TextStyle;
 import pixi.flump.Movie;
 import vega.shell.ApplicationMatchSize;
+import vega.utils.PointXY;
 import vega.utils.UtilsFlump;
+import vega.utils.UtilsPixi;
 
 /**
  * ...
  * @author nico
  */
 class LocalMgr {
-	public static var instance					: LocalMgr;
+	public static var USE_ANTIALIAS_FOR_READABILITY	: Bool						= false;
 	
-	public var TXT_SEP							: String				= "_";
+	public static var instance						: LocalMgr;
 	
-	public var GLOBAL_TAG						: String				= "global";
+	public var TXT_SEP								: String					= "_";
 	
-	var TXT_PREFIX								: String				= "txt";
+	public var GLOBAL_TAG							: String					= "global";
 	
-	var STYLES									: Dynamic				= null;
+	var TXT_PREFIX									: String					= "txt";
 	
-	var defaultLang								: String;
-	var conf									: Dynamic				= null;
+	var STYLES										: Dynamic					= null;
+	
+	var defaultLang									: String;
+	var conf										: Dynamic					= null;
 	
 	/** collection de listener de mise à jour de localisation */
-	var listeners								: Array<Void->Void>		= null;
+	var listeners									: Array<Void->Void>			= null;
 	
 	/**
 	 * création du singleton de gestionnaire de localisation
@@ -237,7 +241,7 @@ class LocalMgr {
 		lParams.fontSize	= lDesc.size;
 		lParams.fill		= lDesc.color;
 		lParams.align		= lDesc.align;
-		//lParams.padding		= lDesc.size; // ça fait rater le multi style
+		lParams.padding		= lDesc.padding; // ça fait rater le multi style
 		lParams.lineHeight	= lDesc.lineHeight;
 		
 		addWordWrapParams( lDesc, lParams);
@@ -270,6 +274,16 @@ class LocalMgr {
 		alignTxt( lTxt, lDesc);
 		
 		return lTxt;
+	}
+	
+	public static function antialiasForReadability( pTxt : Text) : Void {
+		var lCoord	: PointXY	= new PointXY( pTxt.x, pTxt.y);
+		
+		pTxt.parent.toGlobal( cast lCoord, cast lCoord);
+		pTxt.parent.toLocal( cast new PointXY( Math.round( lCoord.x), Math.round( lCoord.y)), ApplicationMatchSize.instance.stage, cast lCoord);
+		
+		pTxt.x = lCoord.x;
+		pTxt.y = lCoord.y;
 	}
 	
 	public function parseAndSetLocalTxtInMovie( pCont : Movie) : Void {
@@ -367,9 +381,13 @@ class LocalMgr {
 	function alignTxt( pTxt : Text, pDesc : TxtDescFlump) : Void {
 		if ( pDesc.align == TxtDescFlump.ALIGN_CENTER) pTxt.x = -pTxt.width / 2;
 		else if ( pDesc.align == TxtDescFlump.ALIGN_RIGHT) pTxt.x = -pTxt.width;
+		else pTxt.x = 0;
 		
 		if ( pDesc.vAlign == TxtDescFlump.V_ALIGN_CENTER) pTxt.y = ( Reflect.field( pTxt.style, "fontSize") - pTxt.height) / 2;
 		else if ( pDesc.vAlign == TxtDescFlump.V_ALIGN_BOT) pTxt.y = Reflect.field( pTxt.style, "fontSize") - pTxt.height;
+		else pTxt.y = 0;
+		
+		if ( pDesc.antialiasForReadability == true) antialiasForReadability( pTxt);
 	}
 	
 	function recursiveApply( pCont : Container, pFunc : Movie -> Void) : Void {

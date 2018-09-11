@@ -101,7 +101,7 @@ class LoadingFile {
 	function onLoadComplete() : Void {
 		if ( Reflect.getProperty( loader.resources, _file.getId()).error == null){
 			ApplicationMatchSize.instance.traceDebug( "INFO : LoadingFile::onLoadComplete : " + _file.getId());
-			trace( Reflect.getProperty( loader.resources, _file.getId()));
+			//trace( Reflect.getProperty( loader.resources, _file.getId()));
 			
 			removeLoaderListener();
 			

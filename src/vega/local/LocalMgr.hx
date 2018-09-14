@@ -54,8 +54,6 @@ class LocalMgr {
 		if ( pConf.documentElement != null) conf = xml2Json( pConf);
 		else conf = pConf.local;
 		
-		trace( conf);
-		
 		listeners	= new Array<Void->Void>();
 		
 		if ( pLang == null && Browser.supported) pLang = Browser.navigator.language;

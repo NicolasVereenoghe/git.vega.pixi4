@@ -108,9 +108,9 @@ class VegaLoader {
 		}
 	}
 	
-	function notifyLoadCurrentFileComplete() : Void { listener.onCurrentFileLoaded( this); }
+	function notifyLoadCurrentFileComplete() : Void { if( listener != null) listener.onCurrentFileLoaded( this); }
 	
-	function notifyLoadComplete() : Void { listener.onLoadComplete( this); }
+	function notifyLoadComplete() : Void { if( listener != null) listener.onLoadComplete( this); }
 	
 	function finalizeLoading() : Void {
 		notifyLoadComplete();

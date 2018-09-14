@@ -24,12 +24,12 @@ class VegaLoaderListener implements IVegaLoaderListener {
 	public function onLoadComplete( pLoader : VegaLoader) : Void {
 		if ( _onLoadComplete != null) {
 			_onLoadComplete( pLoader);
-			
-			_onLoadComplete			= null;
-			_onLoadProgress			= null;
-			_onCurrentFileLoaded	= null;
-			_onLoadError			= null;
 		}
+		
+		_onLoadComplete			= null;
+		_onLoadProgress			= null;
+		_onCurrentFileLoaded	= null;
+		_onLoadError			= null;
 	}
 	
 	public function onCurrentFileLoaded( pLoader : VegaLoader) : Void { if ( _onCurrentFileLoaded != null) _onCurrentFileLoaded( pLoader); }

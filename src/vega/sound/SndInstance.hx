@@ -1,4 +1,5 @@
 package vega.sound;
+import howler.Howler;
 import vega.shell.ApplicationMatchSize;
 import vega.shell.VegaFramer;
 

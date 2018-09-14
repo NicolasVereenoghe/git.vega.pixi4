@@ -51,10 +51,9 @@ class SndDesc {
 		
 		if ( _options.src == null) {
 			if ( pFile == null) pFile = new MyFile( _id);
-			else if ( pFile.getName() == "" || pFile.getName() == null) pFile = new MyFile( pId, pFile.getPath(), pFile.getVersion());
 			
-			lName	= pFile.getName();
-			lPath	= pFile.getPath() != null ? pFile.getPath() : "";
+			lName	= ( pFile.getName() == "" || pFile.getName() == null ? pId : pFile.getName());
+			lPath	= ( pFile.getPath() != null ? pFile.getPath() : "");
 			
 			if( lName.indexOf( "://") != -1) lUrl = lName;
 			else lUrl = lPath + lName;
@@ -69,6 +68,7 @@ class SndDesc {
 		if ( pFile == null) _fileResId = new MyFile( pId);
 		else _fileResId = pFile;
 		
+		//
 		//_options.html5 = true;
 	}
 	

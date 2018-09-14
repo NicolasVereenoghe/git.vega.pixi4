@@ -144,12 +144,10 @@ class SndMgr {
 	 * @param	pSubId		pattern de recherche d'identifiants de son à virer ; laisser null pour tout virer
 	 */
 	public function unload( pSubId : String) : Void {
-		var lTrack	: SndTrack;
-		
-		for ( lTrack in tracks){
-			if ( pSubId == null || lTrack.getDesc().getId().indexOf( pSubId) != -1) {
-				tracks.remove( lTrack.getDesc().getId());
-				lTrack.destroy();
+		for ( iTrack in tracks){
+			if ( pSubId == null || iTrack.getDesc().getId().indexOf( pSubId) != -1) {
+				tracks.remove( iTrack.getDesc().getId());
+				iTrack.destroy();
 			}
 		}
 	}
@@ -191,11 +189,9 @@ class SndMgr {
 	 * @param	pExcludeId	pattern d'exclusion d'identifiants de son ; laisser null pour aucune exclusion
 	 */
 	public function stop( pSubId : String = null, pExcludeId : String = null) : Void {
-		var lTrack	: SndTrack;
-		
-		for ( lTrack in tracks) {
-			if ( pSubId == null || lTrack.getDesc().getId().indexOf( pSubId) != -1) {
-				if ( pExcludeId == null || lTrack.getDesc().getId().indexOf( pExcludeId) == -1) lTrack.stop();
+		for ( iTrack in tracks) {
+			if ( pSubId == null || iTrack.getDesc().getId().indexOf( pSubId) != -1) {
+				if ( pExcludeId == null || iTrack.getDesc().getId().indexOf( pExcludeId) == -1) iTrack.stop();
 			}
 		}
 	}
@@ -207,12 +203,10 @@ class SndMgr {
 	 * @return	true si un son à vérifier est en train d'être joué, false sinon
 	 */
 	public function isPlaying( pSubId : String = null, pExcludeId : String = null) : Bool {
-		var lTrack	: SndTrack;
-		
-		for ( lTrack in tracks) {
-			if ( pSubId == null || lTrack.getDesc().getId().indexOf( pSubId) != -1) {
-				if ( pExcludeId == null || lTrack.getDesc().getId().indexOf( pExcludeId) == -1) {
-					if( lTrack.isPlaying()) return true;
+		for ( iTrack in tracks) {
+			if ( pSubId == null || iTrack.getDesc().getId().indexOf( pSubId) != -1) {
+				if ( pExcludeId == null || iTrack.getDesc().getId().indexOf( pExcludeId) == -1) {
+					if( iTrack.isPlaying()) return true;
 				}
 			}
 		}
@@ -227,10 +221,9 @@ class SndMgr {
 	 */
 	public function getSndTracks( pSubId : String = null) : Array<SndTrack> {
 		var lRes	: Array<SndTrack>	= new Array<SndTrack>();
-		var lTrack	: SndTrack;
 		
-		for ( lTrack in tracks) {
-			if ( pSubId == null || lTrack.getDesc().getId().indexOf( pSubId) != -1) lRes.push( lTrack);
+		for ( iTrack in tracks) {
+			if ( pSubId == null || iTrack.getDesc().getId().indexOf( pSubId) != -1) lRes.push( iTrack);
 		}
 		
 		return lRes;
@@ -242,11 +235,9 @@ class SndMgr {
 	 * @param	pCoef	coef de volume à appliquer à la config de volume des sons ; < 0 pour virer le coef contextuel et revenir à la config initiale
 	 */
 	public function setVolumeCoef( pSubId : String, pCoef : Float) : Void {
-		var lTrack	: SndTrack;
-		
-		for ( lTrack in tracks) {
-			if ( pSubId == null || lTrack.getDesc().getId().indexOf( pSubId) != -1) {
-				lTrack.setVolumeCoef( pCoef);
+		for ( iTrack in tracks) {
+			if ( pSubId == null || iTrack.getDesc().getId().indexOf( pSubId) != -1) {
+				iTrack.setVolumeCoef( pCoef);
 			}
 		}
 	}
@@ -281,6 +272,12 @@ class SndMgr {
 	function isHowlerEndInit() : Bool {
 		if ( _isInitEnd) return true;
 		
+		if ( Howler.ctx == null) {
+			ApplicationMatchSize.instance.traceDebug( "INFO : SndMgr::isHowlerEndInit : undefined ctx, pending ...");
+			
+			return false;
+		}
+		
 		try{
 			Howler.volume( _vol);
 			Howler.mute( isMute);
@@ -289,6 +286,8 @@ class SndMgr {
 			
 			return true;
 		}catch ( pE : Dynamic){
+			ApplicationMatchSize.instance.traceDebug( "INFO : SndMgr::isHowlerEndInit : exception, pending ...");
+			
 			return false;
 		}
 	}
@@ -297,11 +296,9 @@ class SndMgr {
 	 * effectue un traitement de fin d'init de howler
 	 */
 	function onHowlerEndInit() : Void {
-		var lExt : String;
-		
 		ApplicationMatchSize.instance.traceDebug( "INFO : SndMgr::onHowlerEndInit", true);
 		
-		for ( lExt in exts) ApplicationMatchSize.instance.traceDebug( "INFO : SndMgr::onHowlerEndInit : codec " + lExt + " : " + Howler.codecs( lExt.substr( 1)), true);
+		for ( iExt in exts) ApplicationMatchSize.instance.traceDebug( "INFO : SndMgr::onHowlerEndInit : codec " + iExt + " : " + Howler.codecs( iExt.substr( 1)), true);
 		
 		ApplicationMatchSize.instance.traceDebug( "INFO : SndMgr::onHowlerEndInit : ctx=" + Howler.ctx, true);
 		

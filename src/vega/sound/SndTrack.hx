@@ -1,4 +1,5 @@
 package vega.sound;
+import howler.Howl;
 import vega.loader.VegaLoaderMgr;
 import vega.loader.file.LoadingFileHowl;
 import vega.shell.ApplicationMatchSize;
@@ -54,6 +55,27 @@ class SndTrack {
 		_channels = null;
 		endListeners = null;
 		_desc = null;
+	}
+	
+	/**
+	 * annule le loading de l'instance de howl
+	 */
+	public function cancelLoading() : Void {
+		if ( isLoading){
+			isLoading = false;
+			
+			remLoadListener();
+		}
+		
+		if ( ! _desc.getIsLoaded()){
+			if ( _desc.getHowl() != null){
+				ApplicationMatchSize.instance.traceDebug( "WARNING : SndTrack::cancelLoading : " + _desc.getId());
+				
+				_desc.getHowl().unload();
+			}
+			
+			_desc.regHowl( new Howl( _desc.getOptions()));
+		}
 	}
 	
 	/**
@@ -163,7 +185,7 @@ class SndTrack {
 	 * on lance le chargement du son howl
 	 */
 	function doLoad() : Void {
-		ApplicationMatchSize.instance.traceDebug( "INFO : SndTrack::doLoad : " + _desc.getId() + " : " + _desc.getHowl().state());
+		ApplicationMatchSize.instance.traceDebug( "INFO : SndTrack::doLoad : " + _desc.getId() + " : " + ( _desc.getHowl() != null ? _desc.getHowl().state() : "null"));
 		
 		isLoading = true;
 		_desc.getHowl().load();
@@ -176,8 +198,10 @@ class SndTrack {
 	 * on retire les listeners de loading
 	 */
 	function remLoadListener() : Void {
-		_desc.getHowl().off( "load", onTrackLoaded);
-		_desc.getHowl().off( "loaderror", onTrackLoadError);
+		if( _desc.getHowl() != null){
+			_desc.getHowl().off( "load", onTrackLoaded);
+			_desc.getHowl().off( "loaderror", onTrackLoadError);
+		}
 	}
 	
 	/**

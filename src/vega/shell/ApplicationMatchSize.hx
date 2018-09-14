@@ -52,6 +52,12 @@ class ApplicationMatchSize extends Application {
 	var _EXT_WIDTH								: Float			= 1136;
 	var _EXT_HEIGHT								: Float			= 720;
 	
+	/** offset de position du conteneur principal */
+	var _OFFSET_DX								: Int			= 0;
+	var _OFFSET_DY								: Int			= 0;
+	/** offset de scale appliqué au conteneur principal */ 
+	var _OFFSET_SCALE							: Float			= 1;
+	
 	var BORDER									: Float			= 2000;
 	
 	var _content								: Container;
@@ -364,7 +370,7 @@ class ApplicationMatchSize extends Application {
 		updateSize();
 	}
 	
-	function getBGColor() : Int { return 0xFFFFFF; }
+	public function getBGColor() : Int { return 0xFFFFFF; }
 	function getStageBGColor() : Int { return 0x000000; }
 	
 	override function _onWindowResize( pE : Event) {
@@ -405,30 +411,30 @@ class ApplicationMatchSize extends Application {
 		if ( allowScale) _baseScale = lNewW / _MIN_WIDTH;
 		else _baseScale = 1;
 		
-		lNewW				= Math.min( lCurW / _baseScale, _EXT_WIDTH);
-		lNewH				= Math.min( lCurH / _baseScale, _EXT_HEIGHT);
-		
-		_screenRect			= new Rectangle( -lNewW / 2, -lNewH / 2, lNewW, lNewH);
-		
-		_container.scale.x	= _baseScale;
-		_container.scale.y	= _baseScale;
+		_container.scale.x	= _baseScale * _OFFSET_SCALE;
+		_container.scale.y	= _baseScale * _OFFSET_SCALE;
 		
 		cast( _hit.getChildAt( 0), Graphics).width	= lCurW;
 		cast( _hit.getChildAt( 0), Graphics).height	= lCurH;
 		
-		if( ! isTL){
-			_container.x		= Math.round( lCurW / 2);
-			_container.y		= Math.round( lCurH / 2);
+		_hit.x				= lCurW / 2;
+		_hit.y				= lCurH / 2;
+		
+		if ( ! isTL){
+			lNewW				= Math.min( lCurW / _baseScale, _EXT_WIDTH);
+			lNewH				= Math.min( lCurH / _baseScale, _EXT_HEIGHT);
 			
-			_hit.x				= _container.x;
-			_hit.y				= _container.y;
+			_container.x		= Math.round( lCurW / 2) + _OFFSET_DX;
+			_container.y		= Math.round( lCurH / 2) + _OFFSET_DY;
 		}else{
-			_container.x		= Math.round( lNewW / 2);//Math.round( lCurW / 2);
-			_container.y		= Math.round( lNewH / 2);//Math.round( lCurH / 2);
+			lNewW				= Math.max( Math.min( lCurW / _baseScale, _EXT_WIDTH), _MIN_WIDTH);
+			lNewH				= Math.max( Math.min( lCurH / _baseScale, _EXT_HEIGHT), _MIN_HEIGHT);
 			
-			_hit.x				= lCurW / 2;
-			_hit.y				= lCurH / 2;
+			_container.x		= Math.round( lNewW / 2) + _OFFSET_DX;
+			_container.y		= Math.round( lNewH / 2) + _OFFSET_DY;
 		}
+		
+		_screenRect			= new Rectangle( -lNewW / 2, -lNewH / 2, lNewW, lNewH);
 		
 		if ( _borders == null){
 			_borders	= new Graphics();
@@ -443,7 +449,7 @@ class ApplicationMatchSize extends Application {
 			_container.addChild( _borders);
 		}
 		
-		traceDebug( "INFO : ApplicationMatchSize::updateSize : scale=" + ( Math.round( _baseScale * 100) / 100) + " ; screen=" + Math.round( _screenRect.width) + "x" + Math.round( _screenRect.height) + " ; stage=" + lCurW + "x" + lCurH, true);
+		traceDebug( "INFO : ApplicationMatchSize::updateSize : scale=" + ( Math.round( _baseScale * 100) / 100) + ":" + ( _container.scale.x) + " ; screen=" + Math.round( _screenRect.width) + "x" + Math.round( _screenRect.height) + " ; stage=" + lCurW + "x" + lCurH, true);
 		
 		if ( _debugContainer != null){
 			_debugContainer.x	= _screenRect.x;

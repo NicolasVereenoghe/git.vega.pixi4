@@ -40,7 +40,7 @@ class LoadingFileHowl extends LoadingFile {
 		lOptions.autoplay		= false;
 		lOptions.preload		= false;
 		
-		desc.regHowl( new Howl( desc.getOptions()));
+		if( desc.getHowl() == null) desc.regHowl( new Howl( desc.getOptions()));
 		
 		desc.getHowl().on( "load", onLoadComplete);
 		desc.getHowl().on( "loaderror", onLoadError);

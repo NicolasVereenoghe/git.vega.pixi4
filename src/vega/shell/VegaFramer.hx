@@ -18,13 +18,17 @@ class VegaFramer {
 	
 	var isError							: Bool								= false;
 	
+	var fps								: Int								= -1;
+	
 	public static function getInstance() : VegaFramer {
 		if ( instance == null) instance = new VegaFramer();
 		
 		return instance;
 	}
 	
-	function new() {
+	public function new( pFps : Int = -1) {
+		fps = pFps;
+		
 		iterators = new Array<Float -> Void>();
 		
 		lastTime = Date.now().getTime();
@@ -32,6 +36,8 @@ class VegaFramer {
 		if ( Browser.supported) onFrame( 0);
 		else ApplicationMatchSize.instance.traceDebug( "ERROR : VegaFramer::VegaFramer : no browser, no framing ...");
 	}
+	
+	public function destroy() : Void { iterators = null; }
 	
 	public function isRegistered( pIterator : Float -> Void) : Bool { return iterators.indexOf( pIterator) != -1; }
 	
@@ -50,7 +56,14 @@ class VegaFramer {
 		isPause = pIsPause;
 	}
 	
+	function getFps() : Int {
+		if ( fps < 0) return ApplicationMatchSize.instance.fps;
+		else return fps;
+	}
+	
 	function onFrame( pTime : Float) : Void {
+		if ( iterators == null) return;
+		
 		if ( ApplicationMatchSize.instance.debug){
 			if ( isError) return;
 			
@@ -78,7 +91,7 @@ class VegaFramer {
 			requestFrame();
 			
 			lTime	= Date.now().getTime();
-			lInter	= 1000 / ApplicationMatchSize.instance.fps;
+			lInter	= 1000 / getFps();
 			lDT		= Math.min( lTime - lastTime, 3 * lInter);
 			
 			if ( lDT >= lInter){

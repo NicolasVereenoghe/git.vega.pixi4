@@ -1,6 +1,8 @@
 package vega.ui;
 import pixi.core.display.Container;
 import pixi.core.display.DisplayObject;
+import pixi.core.graphics.Graphics;
+import pixi.core.math.shapes.Polygon;
 import pixi.flump.Movie;
 import pixi.interaction.InteractionEvent;
 import vega.shell.ApplicationMatchSize;
@@ -71,6 +73,10 @@ class MyButtonFlump {
 	 * @param	pIsPreservFrame	mettre true pour conserver la frame en cours lors d'une transition d'état, sinon laisser false repartir de dernière frame en cours
 	 */
 	public function new( pCont : Movie, pOnDown : InteractionEvent -> Void = null, pOnRelease : InteractionEvent -> Void = null, pIsAutoPlay : Bool = false, pIsPreservFrame : Bool = false) {
+		var lPt		: DisplayObject;
+		var lPts	: Array<Float>;
+		var lI		: Int;
+		
 		container		= pCont;
 		onDownCB		= [];
 		onReleaseCB		= pOnRelease;
@@ -82,7 +88,24 @@ class MyButtonFlump {
 		
 		if ( pOnDown != null) onDownCB.push( pOnDown);
 		
-		hit				= pCont.getLayer( "hit").getChildAt( 0);
+		if ( UtilsFlump.getLayer( "hit", pCont) != null) hit = pCont.getLayer( "hit").getChildAt( 0);
+		else{
+			lPts = new Array<Float>();
+			
+			lI = 0;
+			lPt = UtilsFlump.getLayer( "hit0", pCont);
+			while ( lPt != null){
+				lPts.push( lPt.x);
+				lPts.push( lPt.y);
+				
+				lPt.interactive = false;
+				
+				lPt = UtilsFlump.getLayer( "hit" + ++lI, pCont);
+			}
+			
+			hit = pCont.addChild( new Graphics());
+			hit.hitArea = new Polygon( lPts);
+		}
 		
 		hit.alpha		= 0;
 		hit.buttonMode	= true;
@@ -98,9 +121,11 @@ class MyButtonFlump {
 		hit.on( "touchend", onTUp);
 		hit.on( "touchendoutside", onTUpOut);
 		
-		stateUp = pCont.getLayer( NAME_UP).getChildAt( 0);
-		stateUp.interactive = false;
-		stateUp.visible = false;
+		if ( UtilsFlump.getLayer( NAME_UP, pCont) != null){
+			stateUp = pCont.getLayer( NAME_UP).getChildAt( 0);
+			stateUp.interactive = false;
+			stateUp.visible = false;
+		}
 		
 		if ( UtilsFlump.getLayer( NAME_OVER, pCont) != null){
 			stateOver = pCont.getLayer( NAME_OVER).getChildAt( 0);
@@ -155,6 +180,12 @@ class MyButtonFlump {
 		
 		hit.buttonMode		= false;
 		hit.interactive		= false;
+		
+		if ( Std.is( hit, Graphics)){
+			container.removeChild( hit);
+			hit.hitArea = null;
+			hit.destroy();
+		}
 		
 		container.visible	= true;
 		

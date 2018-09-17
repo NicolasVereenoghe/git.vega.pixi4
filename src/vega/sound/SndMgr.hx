@@ -272,13 +272,13 @@ class SndMgr {
 	function isHowlerEndInit() : Bool {
 		if ( _isInitEnd) return true;
 		
-		if ( Howler.ctx == null) {
-			ApplicationMatchSize.instance.traceDebug( "INFO : SndMgr::isHowlerEndInit : undefined ctx, pending ...");
-			
-			return false;
-		}
-		
 		try{
+			if ( Howler.usingWebAudio && Howler.ctx == null) {
+				ApplicationMatchSize.instance.traceDebug( "INFO : SndMgr::isHowlerEndInit : undefined ctx, pending ...");
+				
+				return false;
+			}
+			
 			Howler.volume( _vol);
 			Howler.mute( isMute);
 			

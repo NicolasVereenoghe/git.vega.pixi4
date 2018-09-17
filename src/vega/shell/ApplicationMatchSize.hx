@@ -430,8 +430,8 @@ class ApplicationMatchSize extends Application {
 			lNewW				= Math.max( Math.min( lCurW / _baseScale, _EXT_WIDTH), _MIN_WIDTH);
 			lNewH				= Math.max( Math.min( lCurH / _baseScale, _EXT_HEIGHT), _MIN_HEIGHT);
 			
-			_container.x		= Math.round( lNewW / 2) + _OFFSET_DX;
-			_container.y		= Math.round( lNewH / 2) + _OFFSET_DY;
+			_container.x		= Math.round( lNewW * _container.scale.x / 2) + _OFFSET_DX;
+			_container.y		= Math.round( lNewH * _container.scale.y / 2) + _OFFSET_DY;
 		}
 		
 		_screenRect			= new Rectangle( -lNewW / 2, -lNewH / 2, lNewW, lNewH);

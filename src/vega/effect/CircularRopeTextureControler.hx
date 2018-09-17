@@ -1,5 +1,6 @@
 package vega.effect;
-import pixi.core.Pixi.ScaleModes;
+//import pixi.core.Pixi.ScaleModes;
+import pixi.core.Settings;
 import pixi.core.math.shapes.Rectangle;
 import pixi.core.textures.Texture;
 import pixi.flump.Movie;
@@ -45,7 +46,7 @@ class CircularRopeTextureControler {
 		lCont.x		= -lBounds.x;
 		lCont.y		= -lBounds.y;
 		
-		lTexture	= ApplicationMatchSize.instance.renderer.generateTexture( lCont.parent, ScaleModes.DEFAULT, 1);
+		lTexture	= ApplicationMatchSize.instance.renderer.generateTexture( lCont.parent, Settings.SCALE_MODE/*ScaleModes.DEFAULT*/, 1);
 		lW			= lTexture.width;
 		lDA			= 2 * Math.PI * lW / lP;
 		

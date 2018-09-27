@@ -98,6 +98,8 @@ class ApplicationMatchSize extends Application {
 	
 	public function getContent() : Container { return _content; }
 	
+	public function getRootContainer() : Container { return _container; }
+	
 	/**
 	 * on effectue un trace de debug, par dessus l'appli, seulement si on est en debug
 	 * @param	pTxt	ligne de trace
@@ -349,7 +351,8 @@ class ApplicationMatchSize extends Application {
 		lGraph.endFill();
 		_hit.interactive = true;
 		
-		_container	= new Container();
+		//_container	= new Container();
+		_container	= instanciateRootContainer();
 		stage.addChild( _container);
 		
 		_bg = new Graphics();
@@ -369,6 +372,8 @@ class ApplicationMatchSize extends Application {
 		
 		updateSize();
 	}
+	
+	function instanciateRootContainer() : Container { return new Container(); }
 	
 	public function getBGColor() : Int { return 0xFFFFFF; }
 	function getStageBGColor() : Int { return 0x000000; }

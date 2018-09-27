@@ -1,0 +1,19 @@
+{
+    "name": "CanvasInput",
+    "classPath": "src",
+    "license": "MIT",
+    "tags": [
+	"js",
+	"haxe",
+	"web",
+	"text"
+    ],
+    "description": "Externs of CanvasInput",
+    "contributors": [
+	"NicolasVereenoghe"
+    ],
+    "releasenote": "extern first release",
+    "version": "1.2.7",
+    "url": "https://github.com/goldfire/CanvasInput",
+    "dependencies": {}
+}

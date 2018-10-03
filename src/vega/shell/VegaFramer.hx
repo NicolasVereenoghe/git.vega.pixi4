@@ -20,10 +20,19 @@ class VegaFramer {
 	
 	var fps								: Int								= -1;
 	
+	var requestId						: Int								= -1;
+	
 	public static function getInstance() : VegaFramer {
 		if ( instance == null) instance = new VegaFramer();
 		
 		return instance;
+	}
+	
+	public static function freeInstance() : Void {
+		if ( instance != null){
+			instance.destroy();
+			instance = null;
+		}
 	}
 	
 	public function new( pFps : Int = -1) {
@@ -37,7 +46,11 @@ class VegaFramer {
 		else ApplicationMatchSize.instance.traceDebug( "ERROR : VegaFramer::VegaFramer : no browser, no framing ...");
 	}
 	
-	public function destroy() : Void { iterators = null; }
+	public function destroy() : Void {
+		if ( Browser.supported && hasRequest) cancelFrame();
+		
+		iterators = null;
+	}
 	
 	public function isRegistered( pIterator : Float -> Void) : Bool { return iterators.indexOf( pIterator) != -1; }
 	
@@ -46,14 +59,25 @@ class VegaFramer {
 	public function remIterator( pIterator : Float -> Void) : Void { iterators.remove( pIterator); }
 	
 	public function switchPause( pIsPause : Bool) : Void {
-		if ( isPause && ! pIsPause){
+		if ( isPause != pIsPause){
+			if ( ! pIsPause){
+				if ( ! hasRequest) {
+					lastTime = Date.now().getTime();
+					requestFrame();
+				}
+			}else cancelFrame();
+			
+			isPause = pIsPause;
+		}
+		
+		/*if ( isPause && ! pIsPause){
 			if ( ! hasRequest){
 				lastTime = Date.now().getTime();
 				requestFrame();
 			}
 		}
 		
-		isPause = pIsPause;
+		isPause = pIsPause;*/
 	}
 	
 	function getFps() : Int {
@@ -108,6 +132,15 @@ class VegaFramer {
 	
 	function requestFrame() : Void {
 		hasRequest = true;
-		Browser.window.requestAnimationFrame( onFrame);
+		requestId = Browser.window.requestAnimationFrame( onFrame);
+	}
+	
+	function cancelFrame() : Void {
+		if ( hasRequest){
+			Browser.window.cancelAnimationFrame( requestId);
+			
+			hasRequest = false;
+			requestId = -1;
+		}
 	}
 }

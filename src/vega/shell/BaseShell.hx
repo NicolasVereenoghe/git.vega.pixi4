@@ -52,6 +52,39 @@ class BaseShell implements IShell {
 		VegaFramer.getInstance().addIterator( doFrame);
 	}
 	
+	/**
+	 * on prépare le shell à passer en sommeil en libérant la mémoire de ses instances d'écrans ; abstrait : on ne touche pas aux ressources loadées/allouées
+	 */
+	public function reset() : Void {
+		if ( curScreen != null) curScreen.destroy();
+		if ( prevScreen != null) prevScreen.destroy();
+		
+		curScreen = null;
+		prevScreen = null;
+		
+		_container.removeChild( _containerScr).destroy( true);
+		_containerScr = null;
+		
+		VegaFramer.getInstance().remIterator( doFrame);
+		
+		isLocked = false;
+		isCurScreenReady = true;
+		
+		_container = null;
+	}
+	
+	/**
+	 * on réveille l'instance de shell qui a été passé en sommeil ; abstrait : reste à définir l'écran en cours au réveil
+	 * @param	pCont	conteneur à la racine des fenêtres de ce shell
+	 */
+	public function restart( pCont : Container) : Void {
+		_container		= pCont;
+		
+		_containerScr	= cast _container.addChild( new Container());
+		
+		VegaFramer.getInstance().addIterator( doFrame);
+	}
+	
 	public function onScreenReady( pScreen : MyScreen) : Void {
 		isCurScreenReady = true;
 		

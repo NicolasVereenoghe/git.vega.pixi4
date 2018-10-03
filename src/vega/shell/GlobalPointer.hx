@@ -62,6 +62,18 @@ class GlobalPointer {
 	}
 	
 	/**
+	 * libération mémoire de l'instance et du singleton
+	 */
+	public function destroy() : Void {
+		getEventAnchor().removeAllListeners();
+		
+		VegaFramer.getInstance().remIterator( doFrame);
+		
+		instance	= null;
+		datas		= null;
+	}
+	
+	/**
 	 * on vérifie si une coord de touche passe par dessus un rectangle
 	 * @param	pRect	rectangle dans le repère des touches
 	 * @return	listes de touches passant par dessus (liste vide si aucune)

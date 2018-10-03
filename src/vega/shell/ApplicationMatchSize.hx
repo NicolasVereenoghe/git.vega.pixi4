@@ -183,11 +183,7 @@ class ApplicationMatchSize extends Application {
 	 * capture cls de trace
 	 * @param	pE	tacraget de click
 	 */
-	function onBtClsTrace( pE : InteractionEvent) : Void {
-		_debugCtrLine = 0;
-		
-		while ( _debugContainer.children.length > 0) _debugContainer.removeChildAt( 0).destroy();
-	}
+	function onBtClsTrace( pE : InteractionEvent) : Void { freeDebugTxt(); }
 	
 	/**
 	 * on détecte la présence de l'un des motifs de trace debug dans la chaine de trace passée
@@ -319,7 +315,6 @@ class ApplicationMatchSize extends Application {
 		var lVars	: Array<String>;
 		var lKV		: Array<String>;
 		var lI		: String;
-		var lGraph	: Graphics;
 		
 		if ( Browser.supported){
 			lVars = Browser.window.location.search.substring( 1).split( "&");
@@ -344,25 +339,10 @@ class ApplicationMatchSize extends Application {
 		
 		start();
 		
-		_hit		= cast stage.addChild( new Container());
-		lGraph		= cast _hit.addChild( new Graphics());
-		lGraph.beginFill( 0, 0);
-		lGraph.drawRect( -100, -100, 200, 200);
-		lGraph.endFill();
-		_hit.interactive = true;
-		
-		//_container	= new Container();
-		_container	= instanciateRootContainer();
-		stage.addChild( _container);
-		
-		_bg = new Graphics();
-		_bg.beginFill( getBGColor());
-		_bg.drawRect( -_EXT_WIDTH / 2, -_EXT_HEIGHT / 2, _EXT_WIDTH, _EXT_HEIGHT);
-		_bg.endFill();
-		_container.addChild( _bg);
-		
-		_content	= new Container();
-		_container.addChild( _content);
+		initHit();
+		initContainer();
+		initBg();
+		initContent();
 		
 		////////////
 		//stage.interactive = true;
@@ -371,6 +351,152 @@ class ApplicationMatchSize extends Application {
 		onResize = updateSize;
 		
 		updateSize();
+	}
+	
+	/**
+	 * remet l'appli à zéro ; potentiellement le canvas pourra être détruit ; l'appli se trouve en "sommeil" et un appel à "restart" pourra la réveiller
+	 */
+	function reset() : Void {
+		onResize = null;
+		
+		Browser.window.onresize = null;
+		_tmpW = _tmpH = -1;
+		
+		_screenRect = null;
+		
+		freeDebugContent();
+		freeBorders();
+		freeContent();
+		freeHit();
+		freeBg();
+		freeContainer();
+		
+		freeApp();
+	}
+	
+	/**
+	 * réveil une appli mise en "sommeil" avec l'appel à un "reset"
+	 */
+	function restart() : Void {
+		start();
+		
+		initHit();
+		initContainer();
+		initBg();
+		initContent();
+		
+		onResize = updateSize;
+		
+		updateSize();
+	}
+	
+	function freeApp() : Void {
+		app.ticker.remove( _onRequestAnimationFrame);
+		
+		pauseRendering();
+		
+		app.destroy( true);
+		
+		app = null;
+		stage = null;
+		renderer = null;
+		canvas = null;
+	}
+	
+	function freeDebugContent() : Void {
+		if ( _debugContainer != null){
+			UtilsPixi.unsetQuickBt( _debugSwitchBt);
+			_debugSwitchBt.removeChildAt( 0).destroy( true);
+			_container.removeChild( _debugSwitchBt).destroy( true);
+			_debugSwitchBt = null;
+			
+			UtilsPixi.unsetQuickBt( _debugClsBt);
+			_debugClsBt.removeChildAt( 0).destroy( true);
+			_container.removeChild( _debugClsBt).destroy( true);
+			_debugClsBt = null;
+			
+			freeDebugTxt();
+			
+			_container.removeChild( _debugContainer);
+			_debugContainer = null;
+		}
+	}
+	
+	function freeDebugTxt() : Void {
+		while ( _debugContainer.children.length > 0) _debugContainer.removeChildAt( 0).destroy();
+		
+		_debugCtrLine = 0;
+	}
+	
+	function freeBorders() : Void {
+		if( _borders != null){
+			_container.removeChild( _borders).destroy( true);
+			_borders = null;
+		}
+	}
+	
+	function initContent() : Void {
+		_content = new Container();
+		_container.addChild( _content);
+	}
+	
+	function freeContent() : Void {
+		if( _content != null){
+			_container.removeChild( _content).destroy( true);
+			_content = null;
+		}
+	}
+	
+	function initHit() : Void {
+		var lGraph	: Graphics;
+		
+		_hit		= cast stage.addChild( new Container());
+		
+		lGraph		= cast _hit.addChild( new Graphics());
+		
+		lGraph.beginFill( 0, 0);
+		lGraph.drawRect( -100, -100, 200, 200);
+		lGraph.endFill();
+		
+		_hit.interactive = true;
+	}
+	
+	function freeHit() : Void {
+		if ( _hit != null){
+			_hit.removeChildAt( 0).destroy( true);
+			stage.removeChild( _hit).destroy( true);
+			_hit = null;
+		}
+	}
+	
+	function initBg() : Void {
+		_bg = new Graphics();
+		
+		_bg.beginFill( getBGColor());
+		_bg.drawRect( -_EXT_WIDTH / 2, -_EXT_HEIGHT / 2, _EXT_WIDTH, _EXT_HEIGHT);
+		_bg.endFill();
+		
+		_container.addChild( _bg);
+	}
+	
+	function freeBg() : Void {
+		if ( _bg != null){
+			_container.removeChild( _bg).destroy( true);
+			_bg = null;
+		}
+	}
+	
+	function initContainer() : Void {
+		_container	= instanciateRootContainer();
+		
+		stage.addChild( _container);
+	}
+	
+	function freeContainer() : Void {
+		if ( _container != null){
+			stage.removeChild( _container).destroy( true);
+			_container = null;
+		}
 	}
 	
 	function instanciateRootContainer() : Container { return new Container(); }

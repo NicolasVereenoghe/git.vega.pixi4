@@ -24,6 +24,23 @@ class GameShell extends BaseShell implements IGameShell {
 	}
 	
 	/** @inheritDoc */
+	override public function reset() : Void {
+		_container.removeChild( gameContainer).destroy( true);
+		gameContainer = null;
+		
+		super.reset();
+	}
+	
+	/** @inheritDoc */
+	override public function restart( pCont : Container) : Void {
+		gameContainer	= cast pCont.addChild( new Container());
+		
+		super.restart( pCont);
+		
+		// TODO !!
+	}
+	
+	/** @inheritDoc */
 	public function onGameHelp( pHelpTag : String = null) : Void { ApplicationMatchSize.instance.traceDebug( "INFO : GameShell::onGameHelp : " + pHelpTag); }
 	
 	/** @inheritDoc */

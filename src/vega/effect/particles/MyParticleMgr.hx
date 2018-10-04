@@ -34,9 +34,8 @@ class MyParticleMgr {
 	
 	public function destroy() : Void {
 		var lPs	: Array<MyParticle>	= particles.copy();
-		var lP	: MyParticle;
 		
-		for ( lP in lPs) lP.destroy();
+		for ( iP in lPs) iP.destroy();
 		
 		_container = null;
 		particles = null;
